@@ -1,21 +1,28 @@
+<script lang="ts" context="module">
+  export interface QandA {
+    id: string;
+    userName?: string;
+    question: string;
+    botName?: string;
+    answer: string;
+  }
+</script>
+
 <script lang="ts">
   import { marked } from "marked";
   import hljs from "highlight.js";
   import "highlight.js/styles/github-dark-dimmed.min.css";
 
   import { fade } from "svelte/transition";
+  import { getContext } from "svelte";
 
   let {
-    name = "",
-    message = "",
+    qandA,
     isRespOngoing = false,
-    onMessageCopied = () => {},
     onResendMessage = () => {},
   }: {
-    name: string;
-    message: string;
+    qandA: QandA;
     isRespOngoing?: boolean;
-    onMessageCopied?: () => void;
     onResendMessage?: (message: string) => void;
   } = $props();
 
@@ -26,6 +33,7 @@
       return hljs.highlightAuto(code).value;
     }
   }
+
   const renderer = {
     code(_code: string, infostring: any, escaped: any): string {
       const lang = (infostring || "").match(/\S*/)[0];
@@ -58,22 +66,43 @@
 
   let showActionButtons = $state(false);
 
-  function copyToClipboard() {
-    navigator.clipboard.writeText(message);
-    onMessageCopied();
-  }
-
   function handleUrlNavigation(e: Event) {
     if (e.target instanceof HTMLAnchorElement) {
       e.preventDefault();
       const url = (e.target as HTMLAnchorElement).href;
-      open(url);
+
+      copyToClipboard(url, "已复制链接");
     }
   }
+
+  function copyToClipboard(text: string, toastMsg: string = "已复制") {
+    // Fallback method for iOS Safari and other browsers that do not support navigator.clipboard
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    // Make the textarea out of viewport
+    textArea.style.position = "fixed";
+    textArea.style.left = "-9999px";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    try {
+      const successful = document.execCommand("copy");
+      const msg = successful ? toastMsg : "复制失败";
+      toast.show(msg);
+    } catch (err) {
+      console.error("Fallback: Oops, unable to copy", err);
+      toast.show("复制失败");
+    }
+
+    document.body.removeChild(textArea);
+  }
+
+  let toast: { show: (msg: string) => void } = getContext("toast");
 </script>
 
 <div
-  class="p-4 border-b border-gray-200"
+  class="rounded-md mx-2 my-2 border-gray-200 border shadow-sm"
   onmouseover={() => {
     showActionButtons = true;
   }}
@@ -84,31 +113,59 @@
     showActionButtons = false;
   }}
 >
-  <p class="relative font-bold text-blue-500">
-    {name}
-    {#if showActionButtons}
-      <span transition:fade={{ duration: 300 }}>
-        <button class="ml-4 p-0 text-xs text-blue-400" onclick={copyToClipboard}
-          >复制</button
-        >
-        {#if name === "User"}
+  <div class="px-4 py-3 border-b border-gray-200">
+    <p class="relative font-bold text-blue-500">
+      {qandA.userName ? qandA.userName : "User"}
+      {#if showActionButtons}
+        <span transition:fade={{ duration: 300 }}>
+          <button
+            class="ml-4 p-0 text-xs text-blue-400"
+            onclick={() => {
+              copyToClipboard(qandA.question);
+            }}
+          >
+            复制
+          </button>
           <button
             class="ml-2 p-0 text-xs text-blue-400"
             onclick={() => {
-              onResendMessage(message);
-            }}>再次发送</button
+              onResendMessage(qandA.question);
+            }}
           >
-        {/if}
-      </span>
-    {/if}
-  </p>
-  <article class="prose mt-2 max-w-none" onclick={handleUrlNavigation}>
-    {#if message.length === 0 && isRespOngoing}
-      <div class="blink">_</div>
-    {:else}
-      {@html marked.parse(message)}
-    {/if}
-  </article>
+            再次发送
+          </button>
+        </span>
+      {/if}
+    </p>
+    <article class="prose mt-2 max-w-none" onclick={handleUrlNavigation}>
+      {@html marked.parse(qandA.question)}
+    </article>
+  </div>
+
+  <div class="px-4 py-3">
+    <p class="relative font-bold text-blue-500">
+      {qandA.botName}
+      {#if showActionButtons}
+        <span transition:fade={{ duration: 300 }}>
+          <button
+            class="ml-4 p-0 text-xs text-blue-400"
+            onclick={() => {
+              copyToClipboard(qandA.answer);
+            }}
+          >
+            复制
+          </button>
+        </span>
+      {/if}
+    </p>
+    <article class="prose mt-2 max-w-none" onclick={handleUrlNavigation}>
+      {#if qandA.answer.length === 0 && isRespOngoing}
+        <div class="blink">_</div>
+      {:else}
+        {@html marked.parse(qandA.answer)}
+      {/if}
+    </article>
+  </div>
 </div>
 
 <style>
