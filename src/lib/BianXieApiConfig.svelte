@@ -5,7 +5,7 @@
   let apiKey = bianXieApi.getApiKey();
   let chosenModel = bianXieApi.getModel();
 
-  let availableModels = ["gpt-4o", "gpt-3.5-turbo"];
+  let availableModels = ["gpt-3.5-turbo", "gpt-4o", "gpt-4o-all"];
 
   $effect(() => {
     return () => {
