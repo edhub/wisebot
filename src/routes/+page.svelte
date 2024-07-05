@@ -1,6 +1,7 @@
 <script lang="ts">
   import { getContext, tick, untrack } from "svelte";
   import Message from "./Message.svelte";
+  import { queryBianXie } from "$lib/query_bian_xie";
 
   const KEY_CHAT_LOG = "chatLog1";
 
@@ -61,11 +62,11 @@
       // 	}
       //  }
 
-      //  const deltaReader = queryBianXie(tmpMsg, selectedModel, serverUrl);
+      const deltaReader = queryBianXie(tmpMsg);
 
-      //  for await (const delta of deltaReader) {
-      // 	respMessage += delta;
-      //  }
+      for await (const delta of deltaReader) {
+        respMessage += delta;
+      }
 
       respMessage = respMessage.length > 0 ? respMessage : "好像出错啦";
 
