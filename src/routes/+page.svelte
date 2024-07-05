@@ -1,14 +1,14 @@
 <script lang="ts">
   import { getContext, tick, untrack } from "svelte";
   import Message from "./Message.svelte";
-  import { queryBianXie } from "$lib/query_bian_xie";
+  import bianXieApi from "$lib/query_bian_xie";
+  import Menu from "./Menu.svelte";
 
   const KEY_CHAT_LOG = "chatLog1";
 
   interface Message {
     id: string;
     name: string;
-    model: string;
     message: string;
   }
 
@@ -35,7 +35,7 @@
 
   function resendMessage(msg: string) {
     message = msg;
-    sendMessage();
+    textarea.focus();
   }
 
   async function sendMessage() {
@@ -48,21 +48,11 @@
       let tmpMsg = message;
       message = "";
 
-      chatLog.push({ id: genId(), name: "User", model: "", message: tmpMsg });
+      chatLog.push({ id: genId(), name: "User", message: tmpMsg });
       chatLog = chatLog;
       isRespOngoing = true;
 
-      //  const url = tmpMsg.match(urlRegex);
-
-      //  if (url) {
-      // 	for (let i = 0; i < url.length; i++) {
-      // 	  const content =
-      // 		 (await grabContentFromUrl(url[i])) || "(无法打开这个网页)";
-      // 	  tmpMsg = tmpMsg.replace(url[i], `${url[i]} ${content}`);
-      // 	}
-      //  }
-
-      const deltaReader = queryBianXie(tmpMsg);
+      const deltaReader = bianXieApi.query(tmpMsg);
 
       for await (const delta of deltaReader) {
         respMessage += delta;
@@ -72,8 +62,7 @@
 
       chatLog.push({
         id: genId(),
-        name: "gpt-4o",
-        model: selectedModel,
+        name: bianXieApi.getModel(),
         message: respMessage,
       });
       chatLog = chatLog;
@@ -116,39 +105,14 @@
     chatContainer.scrollIntoView({ behavior: "smooth", block: "end" });
   }
 
-  let selectedModel = $state(
-    localStorage.getItem("selectedModel") ?? "codegemma"
-  );
-
-  // $effect(() => {
-  //   if (selectedModel !== "") {
-  //     let model = selectedModel;
-  //     localStorage.setItem("selectedModel", model);
-  //     untrack(() => toast.show("已选模型: " + model));
-  //   }
-  // });
-
-  let serverUrl = $state(
-    localStorage.getItem("serverUrl") ?? "http://10.1.22.88:11434"
-  );
-
-  $effect(() => {
-    if (serverUrl === "") {
-      serverUrl = "http://localhost:11434";
-    }
-    serverUrl = serverUrl.replace(/\/$/, ""); // trim last slash
-    localStorage.setItem("serverUrl", serverUrl);
-  });
-
   let toast: { show: (msg: string) => void } = getContext("toast");
 </script>
 
 <div class="z-0 w-full h-full">
   <div bind:this={chatContainer} class=" flex flex-col overflow-y-auto pb-20">
-    {#each chatLog as { id, name, model, message } (id)}
+    {#each chatLog as { id, name, message } (id)}
       <Message
         {name}
-        model="gpt-4o"
         {message}
         onMessageCopied={() => {
           toast.show("消息已复制到剪贴板");
@@ -158,8 +122,7 @@
     {/each}
     {#if isRespOngoing}
       <Message
-        name="gpt-4o"
-        model={selectedModel}
+        name={bianXieApi.getModel()}
         message={respMessage}
         {isRespOngoing}
       />
@@ -202,11 +165,16 @@
 </div>
 
 <button
-  class="fixed top-0 right-0 m-2 p-2 rounded bg-red-400 hover:bg-red-500 text-white"
-  onclick={() => {
+  class="fixed top-0 right-0 m-2 p-2 rounded bg-blue-400 hover:bg-blue-500 text-white"
+  onclick={() => (showMenu = true)}
+>
+  <span class="iconify simple-line-icons--menu"> </span>
+</button>
+
+<Menu
+  bind:showMenu
+  clearChat={() => {
     chatLog = [];
     localStorage.removeItem(KEY_CHAT_LOG);
   }}
->
-  <span class="iconify simple-line-icons--trash text-2xl"> </span>
-</button>
+/>

@@ -7,14 +7,12 @@
 
   let {
     name = "",
-    model = "",
     message = "",
     isRespOngoing = false,
     onMessageCopied = () => {},
     onResendMessage = () => {},
   }: {
     name: string;
-    model: string;
     message: string;
     isRespOngoing?: boolean;
     onMessageCopied?: () => void;

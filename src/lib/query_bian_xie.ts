@@ -1,14 +1,42 @@
-const MODEL_NAME = "codegemma";
-const DEFAULT_TEMPRATURE = 0.9;
+export const KEY_API_KEY = "key_bian_xie_api_key";
+export const KEY_CHOSEN_MODEL = "key_bian_xie_chosen_model";
 
-export async function* queryBianXie(
-  prompt: string = "Hi",
-  server: string = "https://api.bianxie.ai",
-  temprature: number = 0.7
-) {
+let apiKey = localStorage.getItem(KEY_API_KEY) || "";
+let chosenModel = localStorage.getItem(KEY_CHOSEN_MODEL) || "gpt-3.5-turbo";
+
+function getApiKey() {
+  return apiKey;
+}
+
+function setApiKey(key: string) {
+  if (apiKey === key) {
+    return;
+  }
+  apiKey = key;
+  localStorage.setItem(KEY_API_KEY, apiKey);
+}
+
+function getModel() {
+  return chosenModel;
+}
+
+function setModel(model: string) {
+  if (chosenModel === model) {
+    return;
+  }
+
+  chosenModel = model;
+  localStorage.setItem(KEY_CHOSEN_MODEL, model);
+}
+
+async function* query(prompt: string = "Hi", temprature: number = 0.7) {
+  if (!apiKey) {
+    yield "API key is not set.";
+    return;
+  }
+
   const body = JSON.stringify({
-    model: "gpt-4o",
-    // model: "gpt-3.5-turbo",
+    model: chosenModel,
     messages: [{ role: "user", content: prompt }],
     temprature: temprature,
     stream: true,
@@ -18,7 +46,7 @@ export async function* queryBianXie(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: "Bearer ",
+      Authorization: `Bearer ${apiKey}`,
     },
     body,
   });
@@ -26,7 +54,6 @@ export async function* queryBianXie(
   const reader = resp.body?.getReader();
   if (!reader) {
     yield "No response from the server.";
-    console.log("server is", server);
     return;
   }
 
@@ -65,3 +92,13 @@ export async function* queryBianXie(
     }
   }
 }
+
+const bianXieApi = {
+  getApiKey,
+  setApiKey,
+  getModel,
+  setModel,
+  query,
+};
+
+export default bianXieApi;
