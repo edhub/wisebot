@@ -120,13 +120,13 @@
     localStorage.getItem("selectedModel") ?? "codegemma"
   );
 
-  $effect(() => {
-    if (selectedModel !== "") {
-      let model = selectedModel;
-      localStorage.setItem("selectedModel", model);
-      untrack(() => toast.show("已选模型: " + model));
-    }
-  });
+  // $effect(() => {
+  //   if (selectedModel !== "") {
+  //     let model = selectedModel;
+  //     localStorage.setItem("selectedModel", model);
+  //     untrack(() => toast.show("已选模型: " + model));
+  //   }
+  // });
 
   let serverUrl = $state(
     localStorage.getItem("serverUrl") ?? "http://10.1.22.88:11434"
@@ -167,10 +167,10 @@
   </div>
 
   <form
-    class="chat-input fixed bottom-0 w-full bg-white flex items-end"
+    class="chat-input fixed bottom-0 w-full bg-white flex items-start pb-3"
     onsubmit={(e) => {
       e.preventDefault();
-      sendMessage;
+      sendMessage();
     }}
   >
     <textarea
@@ -196,7 +196,7 @@
       type="submit"
       class="m-2 ml-0 p-2 rounded bg-blue-400 hover:bg-blue-500 text-white"
     >
-      <span class="iconify simple-line-icons--paper-plane"></span>
+      <span class="iconify simple-line-icons--paper-plane text-2xl"></span>
     </button>
   </form>
 </div>
@@ -208,5 +208,5 @@
     localStorage.removeItem(KEY_CHAT_LOG);
   }}
 >
-  <span class="iconify simple-line-icons--trash"> </span>
+  <span class="iconify simple-line-icons--trash text-2xl"> </span>
 </button>
