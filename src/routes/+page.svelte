@@ -117,7 +117,7 @@
     class="chat-input fixed bottom-0 w-full bg-white flex items-start pb-3"
     onsubmit={(e) => {
       e.preventDefault();
-      sendMessage();
+      if (!isRespOngoing) sendMessage();
     }}
   >
     <textarea
@@ -129,7 +129,13 @@
       rows="2"
       maxlength="4000"
       onkeydown={async (e) => {
-        if (e.key === "Enter" && e.keyCode === 13 && !e.altKey && !e.shiftKey) {
+        if (
+          !isRespOngoing &&
+          e.key === "Enter" &&
+          e.keyCode === 13 &&
+          !e.altKey &&
+          !e.shiftKey
+        ) {
           e.preventDefault();
           sendMessage();
           resizeTextarea();
