@@ -62,6 +62,7 @@
     },
   };
 
+  // @ts-ignore
   marked.use({ renderer });
 
   let showActionButtons = $state(false);

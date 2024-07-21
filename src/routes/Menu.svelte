@@ -1,7 +1,6 @@
 <script lang="ts">
   import { fade, slide } from "svelte/transition";
   import BianXieApiConfig from "$lib/BianXieApiConfig.svelte";
-  import { tick } from "svelte";
 
   let {
     showMenu = $bindable(false),
@@ -15,8 +14,6 @@
 {#if showMenu}
   <div
     onclick={async () => {
-      // wait for the click event to propagate
-      // await new Promise((resolve) => setTimeout(resolve, 50));
       showMenu = false;
     }}
     transition:fade={{ duration: 250 }}

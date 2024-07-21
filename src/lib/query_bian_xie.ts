@@ -2,7 +2,7 @@ export const KEY_API_KEY = "key_bian_xie_api_key";
 export const KEY_CHOSEN_MODEL = "key_bian_xie_chosen_model";
 
 let apiKey = localStorage.getItem(KEY_API_KEY) || "";
-let chosenModel = localStorage.getItem(KEY_CHOSEN_MODEL) || "gpt-3.5-turbo";
+let chosenModel = localStorage.getItem(KEY_CHOSEN_MODEL) || "gpt-4o-mini";
 
 function getApiKey() {
   return apiKey;
@@ -81,9 +81,7 @@ async function* query(prompt: string = "Hi", temprature: number = 0.7) {
     try {
       let delta = splits
         .map((s) => {
-          return s.endsWith("[DONE]")
-            ? ""
-            : JSON.parse(s).choices[0].delta.content;
+          return s.endsWith("[DONE]") ? "" : JSON.parse(s).choices[0].delta.content;
         })
         .join("");
       yield delta;
