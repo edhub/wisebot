@@ -20,10 +20,12 @@
     qandA,
     isRespOngoing = false,
     onResendMessage = () => {},
+    deleteQA,
   }: {
     qandA: QandA;
     isRespOngoing?: boolean;
     onResendMessage?: (message: string) => void;
+    deleteQA?: (qa: QandA) => void;
   } = $props();
 
   function highlight(code: string, lang: string) {
@@ -48,14 +50,7 @@
       if (!lang || !langPrefix) {
         return "<pre><code>" + _code + "</code></pre>\n";
       }
-      return (
-        '<pre><code class="' +
-        langPrefix +
-        lang +
-        '">' +
-        _code +
-        "</code></pre>\n"
-      );
+      return '<pre><code class="' + langPrefix + lang + '">' + _code + "</code></pre>\n";
     },
     link(href: string, title: string | null | undefined, text: string): string {
       return `<a href="${href}">${text}</a>`;
@@ -97,6 +92,13 @@
     }
 
     document.body.removeChild(textArea);
+  }
+
+  function deleteMsg(qa: QandA) {
+    if (deleteQA) {
+      deleteQA(qa);
+      toast.show("已删除");
+    }
   }
 
   let toast: { show: (msg: string) => void } = getContext("toast");
@@ -155,6 +157,14 @@
             }}
           >
             复制
+          </button>
+          <button
+            class="ml-2 p-0 text-xs text-blue-400"
+            onclick={() => {
+              deleteMsg(qandA);
+            }}
+          >
+            删除
           </button>
         </span>
       {/if}

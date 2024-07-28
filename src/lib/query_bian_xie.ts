@@ -1,8 +1,8 @@
-export const KEY_API_KEY = "key_bian_xie_api_key";
-export const KEY_CHOSEN_MODEL = "key_bian_xie_chosen_model";
+export const KEY_BX_API_KEY = "key_bian_xie_api_key";
+export const KEY_BX_CHOSEN_MODEL = "key_bian_xie_chosen_model";
 
-let apiKey = localStorage.getItem(KEY_API_KEY) || "";
-let chosenModel = localStorage.getItem(KEY_CHOSEN_MODEL) || "gpt-4o-mini";
+let apiKey = localStorage.getItem(KEY_BX_API_KEY) || "";
+let chosenModel = localStorage.getItem(KEY_BX_CHOSEN_MODEL) || "gpt-4o-mini";
 
 function getApiKey() {
   return apiKey;
@@ -13,7 +13,7 @@ function setApiKey(key: string) {
     return;
   }
   apiKey = key;
-  localStorage.setItem(KEY_API_KEY, apiKey);
+  localStorage.setItem(KEY_BX_API_KEY, apiKey);
 }
 
 function getModel() {
@@ -26,10 +26,10 @@ function setModel(model: string) {
   }
 
   chosenModel = model;
-  localStorage.setItem(KEY_CHOSEN_MODEL, model);
+  localStorage.setItem(KEY_BX_CHOSEN_MODEL, model);
 }
 
-async function* query(prompt: string = "Hi", temprature: number = 0.7) {
+async function* queryBianXie(prompt: string = "Hi", temprature: number = 0.7) {
   if (!apiKey) {
     yield "API key is not set.";
     return;
@@ -91,12 +91,12 @@ async function* query(prompt: string = "Hi", temprature: number = 0.7) {
   }
 }
 
-const bianXieApi = {
+const BianXieApi = {
   getApiKey,
   setApiKey,
   getModel,
   setModel,
-  query,
+  query: queryBianXie,
 };
 
-export default bianXieApi;
+export default BianXieApi;

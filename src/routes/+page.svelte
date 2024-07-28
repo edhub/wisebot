@@ -1,8 +1,11 @@
 <script lang="ts">
   import { tick } from "svelte";
   import Message, { type QandA } from "./Message.svelte";
-  import bianXieApi from "$lib/query_bian_xie";
+  // import bianXieApi from "$lib/query_bian_xie";
   import Menu from "./Menu.svelte";
+  import { llmApi } from "$lib/query_chooser";
+  import { scale, slide } from "svelte/transition";
+  // import { query } from "$lib/query_chooser";
 
   const KEY_CHAT_LOG = "chatLog2";
 
@@ -42,13 +45,13 @@
       tempQA = {
         id: genId(),
         question: tmpMsg,
-        botName: bianXieApi.getModel(),
+        botName: llmApi.model,
         answer: "",
       };
 
       isRespOngoing = true;
 
-      const deltaReader = bianXieApi.query(tmpMsg);
+      const deltaReader = llmApi.query(tmpMsg);
 
       for await (const delta of deltaReader) {
         tempQA.answer += delta;
@@ -79,9 +82,7 @@
   function shouldAutoScroll() {
     const threshold = 250; // distance from bottom in pixels
     const distanceFromBottom =
-      document.documentElement.scrollHeight -
-      window.scrollY -
-      window.innerHeight;
+      document.documentElement.scrollHeight - window.scrollY - window.innerHeight;
     const isScrolling = Date.now() - scrollTime < 100;
     const nearBottom = distanceFromBottom < threshold;
     return isRespOngoing && nearBottom && !isScrolling;
@@ -93,6 +94,11 @@
     }
   });
 
+  function deleteQA(qa: QandA) {
+    chatLog = chatLog.filter((q) => q.id !== qa.id);
+    localStorage.setItem(KEY_CHAT_LOG, JSON.stringify(chatLog));
+  }
+
   async function scrollToBottom() {
     await tick();
     chatContainer.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -102,14 +108,10 @@
 <div class="z-0 w-full h-full">
   <div bind:this={chatContainer} class=" flex flex-col overflow-y-auto pb-24">
     {#each chatLog as qa (qa.id)}
-      <Message qandA={qa} onResendMessage={resendMessage} />
+      <Message qandA={qa} onResendMessage={resendMessage} {deleteQA} />
     {/each}
     {#if isRespOngoing}
-      <Message
-        qandA={tempQA}
-        isRespOngoing={true}
-        onResendMessage={resendMessage}
-      />
+      <Message qandA={tempQA} isRespOngoing={true} onResendMessage={resendMessage} />
     {/if}
   </div>
 
@@ -129,13 +131,7 @@
       rows="2"
       maxlength="4000"
       onkeydown={async (e) => {
-        if (
-          !isRespOngoing &&
-          e.key === "Enter" &&
-          e.keyCode === 13 &&
-          !e.altKey &&
-          !e.shiftKey
-        ) {
+        if (!isRespOngoing && e.key === "Enter" && e.keyCode === 13 && !e.altKey && !e.shiftKey) {
           e.preventDefault();
           sendMessage();
           resizeTextarea();
@@ -144,10 +140,7 @@
       oninput={resizeTextarea}
     ></textarea>
 
-    <button
-      type="submit"
-      class="m-2 ml-0 p-2 rounded bg-blue-400 hover:bg-blue-500 text-white"
-    >
+    <button type="submit" class="m-2 ml-0 p-2 rounded bg-blue-400 hover:bg-blue-500 text-white">
       <span class="iconify simple-line-icons--paper-plane text-2xl"></span>
     </button>
   </form>
