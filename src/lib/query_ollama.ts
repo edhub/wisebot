@@ -17,13 +17,20 @@ async function* queryOllama(prompt: string = "Hi", temprature: number = 0.7) {
     keep_alive: "90m",
   });
 
-  const resp = await fetch(serverUrl + "/api/generate", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body,
-  });
+  let resp;
+
+  try {
+    resp = await fetch(serverUrl + "/api/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body,
+    });
+  } catch (e: any) {
+    yield `出错啦: ${e.message}`;
+    return;
+  }
 
   const reader = resp.body?.getReader();
   if (!reader) {

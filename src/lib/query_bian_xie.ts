@@ -29,6 +29,8 @@ function setModel(model: string) {
   localStorage.setItem(KEY_BX_CHOSEN_MODEL, model);
 }
 
+const SERVER_URL = "https://api.bianxie.ai/v1/chat/completions";
+
 async function* queryBianXie(prompt: string = "Hi", temprature: number = 0.7) {
   if (!apiKey) {
     yield "API key is not set.";
@@ -41,15 +43,21 @@ async function* queryBianXie(prompt: string = "Hi", temprature: number = 0.7) {
     temprature: temprature,
     stream: true,
   });
-  const url = "https://api.bianxie.ai/v1/chat/completions";
-  const resp = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body,
-  });
+
+  let resp;
+  try {
+    resp = await fetch(SERVER_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body,
+    });
+  } catch (e: any) {
+    yield `出错啦: ${e.message}`;
+    return;
+  }
 
   const reader = resp.body?.getReader();
   if (!reader) {
