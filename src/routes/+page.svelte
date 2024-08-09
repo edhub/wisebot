@@ -80,10 +80,10 @@
 
   let scrollTime = 0;
   function shouldAutoScroll() {
-    const threshold = 250; // distance from bottom in pixels
+    const threshold = 350; // distance from bottom in pixels
     const distanceFromBottom =
       document.documentElement.scrollHeight - window.scrollY - window.innerHeight;
-    const isScrolling = Date.now() - scrollTime < 100;
+    const isScrolling = Date.now() - scrollTime < 70;
     const nearBottom = distanceFromBottom < threshold;
     return isRespOngoing && nearBottom && !isScrolling;
   }
