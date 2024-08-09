@@ -29,6 +29,7 @@
   />
 {:else}
   <p
+    class="whitespace-nowrap overflow-hidden text-ellipsis"
     onclick={(e) => {
       editing = true;
       tempValue = value;

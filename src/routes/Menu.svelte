@@ -22,9 +22,9 @@
   >
     <div
       transition:slide={{ duration: 250, axis: "x" }}
-      class="fixed top-0 right-0 h-full w-64 overflow-auto bg-white border-l border-gray-200"
+      class="fixed top-0 right-0 h-full w-80 overflow-auto bg-white border-l border-gray-200"
     >
-      <div class="w-64 p-4">
+      <div class="w-80 p-4">
         <BianXieApiConfig />
 
         <OllamaApiConfig />

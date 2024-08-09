@@ -1,11 +1,8 @@
 <script lang="ts">
   import { tick } from "svelte";
   import Message, { type QandA } from "./Message.svelte";
-  // import bianXieApi from "$lib/query_bian_xie";
   import Menu from "./Menu.svelte";
   import { llmApi } from "$lib/query_chooser";
-  import { scale, slide } from "svelte/transition";
-  // import { query } from "$lib/query_chooser";
 
   const KEY_CHAT_LOG = "chatLog2";
 

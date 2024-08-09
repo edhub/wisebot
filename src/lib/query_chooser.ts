@@ -21,7 +21,9 @@ interface LlmService {
 }
 
 const llmBianXie: LlmService = {
-  model: bianXieApi.getModel(),
+  get model() {
+    return bianXieApi.getModel();
+  },
   query: bianXieApi.query,
 };
 
