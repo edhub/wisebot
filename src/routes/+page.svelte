@@ -65,6 +65,10 @@
 
       isRespOngoing = false;
 
+      if (nearBottom()) {
+        scrollToBottom();
+      }
+
       localStorage.setItem(KEY_CHAT_LOG, JSON.stringify(chatLog));
     }
   }
@@ -79,13 +83,15 @@
   });
 
   let scrollTime = 0;
-  function shouldAutoScroll() {
+  function nearBottom() {
     const threshold = 350; // distance from bottom in pixels
     const distanceFromBottom =
       document.documentElement.scrollHeight - window.scrollY - window.innerHeight;
+    return distanceFromBottom < threshold;
+  }
+  function shouldAutoScroll() {
     const isScrolling = Date.now() - scrollTime < 70;
-    const nearBottom = distanceFromBottom < threshold;
-    return isRespOngoing && nearBottom && !isScrolling;
+    return isRespOngoing && nearBottom() && !isScrolling;
   }
 
   $effect(() => {
