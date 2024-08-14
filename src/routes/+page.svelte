@@ -79,6 +79,17 @@
     return () => window.removeEventListener("scroll", updateScrollTime);
   });
 
+  $effect(() => {
+    const quickInputListener = (e: KeyboardEvent) => {
+      if (e.key === "/" || (e.key === "k" && e.metaKey)) {
+        e.preventDefault();
+        textarea.focus();
+      }
+    };
+    window.addEventListener("keydown", quickInputListener);
+    return () => window.removeEventListener("keydown", quickInputListener);
+  });
+
   let scrollTime = 0;
   function nearBottom() {
     const threshold = 350; // distance from bottom in pixels

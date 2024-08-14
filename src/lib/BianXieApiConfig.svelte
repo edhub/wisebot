@@ -12,12 +12,11 @@
 
   let availableModels = [
     "gpt-4o-mini",
-    "claude-3-haiku-20240307",
-    "gemini-1.5-pro-exp-0801",
     "gpt-4o-2024-08-06",
     "gpt-4o-all",
+    "claude-3-haiku-20240307",
     "claude-3-5-sonnet-20240620",
-    // "gemini-pro",
+    "gemini-1.5-pro-exp-0801",
   ];
 
   $effect(() => {
