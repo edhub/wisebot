@@ -12,11 +12,8 @@
 
   let availableModels = [
     "gpt-4o-mini",
-    "gpt-4o-2024-08-06",
-    "gpt-4o-all",
-    "claude-3-haiku-20240307",
     "claude-3-5-sonnet-20240620",
-    "gemini-1.5-pro-exp-0801",
+    "o1-mini"
   ];
 
   $effect(() => {

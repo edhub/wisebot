@@ -37,11 +37,13 @@ async function* queryBianXie(prompt: string = "Hi", temprature: number = 0.7) {
     return;
   }
 
+  const stream = chosenModel.startsWith("o1-mini") ? false : true;
+
   const body = JSON.stringify({
     model: chosenModel,
     messages: [{ role: "user", content: prompt }],
     temprature: temprature,
-    stream: true,
+    stream
   });
 
   let resp;
@@ -69,32 +71,45 @@ async function* queryBianXie(prompt: string = "Hi", temprature: number = 0.7) {
 
   let tailing = "";
 
-  while (true) {
+  if (stream) {
+    while (true) {
+      const { done, value } = await reader.read();
+
+      if (done) {
+        break;
+      }
+
+      // split the response by newline, and filter empty strings
+      let textDelta = tailing + decoder.decode(value);
+      let splits = textDelta
+        .split("\n")
+        .flatMap((s) => s.split("data: "))
+        .filter(Boolean);
+
+      const badEnd = !(textDelta.endsWith("]}") || textDelta.endsWith("[DONE]"));
+      tailing = badEnd ? splits.splice(splits.length - 1, 1)[0] : "";
+
+      try {
+        let delta = splits
+          .map((s) => {
+            return s.endsWith("[DONE]")
+              ? ""
+              : JSON.parse(s).choices[0].delta.content;
+          })
+          .join("");
+        yield delta;
+      } catch (e) {
+        console.log(textDelta);
+      }
+    }
+  } else {
     const { done, value } = await reader.read();
 
-    if (done) {
-      break;
-    }
-
-    // split the response by newline, and filter empty strings
-    let textDelta = tailing + decoder.decode(value);
-    let splits = textDelta
-      .split("\n")
-      .flatMap((s) => s.split("data: "))
-      .filter(Boolean);
-
-    const badEnd = !(textDelta.endsWith("]}") || textDelta.endsWith("[DONE]"));
-    tailing = badEnd ? splits.splice(splits.length - 1, 1)[0] : "";
-
+    const text = decoder.decode(value);
     try {
-      let delta = splits
-        .map((s) => {
-          return s.endsWith("[DONE]") ? "" : JSON.parse(s).choices[0].delta.content;
-        })
-        .join("");
-      yield delta;
+      yield JSON.parse(text).choices[0].message.content;
     } catch (e) {
-      console.log(textDelta);
+      console.log(text);
     }
   }
 }

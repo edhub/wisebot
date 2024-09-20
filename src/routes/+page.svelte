@@ -81,7 +81,7 @@
 
   $effect(() => {
     const quickInputListener = (e: KeyboardEvent) => {
-      if (e.key === "/" || (e.key === "k" && e.metaKey)) {
+      if (e.key === "k" && e.metaKey) {
         e.preventDefault();
         textarea.focus();
       }
