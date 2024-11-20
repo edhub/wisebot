@@ -37,13 +37,15 @@ async function* queryBianXie(prompt: string = "Hi", temprature: number = 0.7) {
     return;
   }
 
+  // o1mini 不用 stream 整体速度会快很多。
   const stream = chosenModel.startsWith("o1-mini") ? false : true;
+  // const stream = false;
 
   const body = JSON.stringify({
     model: chosenModel,
     messages: [{ role: "user", content: prompt }],
     temprature: temprature,
-    stream
+    stream,
   });
 
   let resp;
@@ -88,6 +90,9 @@ async function* queryBianXie(prompt: string = "Hi", temprature: number = 0.7) {
 
       const badEnd = !(textDelta.endsWith("]}") || textDelta.endsWith("[DONE]"));
       tailing = badEnd ? splits.splice(splits.length - 1, 1)[0] : "";
+      if (badEnd) {
+        console.log(tailing);
+      }
 
       try {
         let delta = splits
@@ -99,13 +104,20 @@ async function* queryBianXie(prompt: string = "Hi", temprature: number = 0.7) {
           .join("");
         yield delta;
       } catch (e) {
+        console.log(e);
         console.log(textDelta);
       }
     }
   } else {
-    const { done, value } = await reader.read();
+    let text = "";
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) {
+        break;
+      }
+      text += decoder.decode(value);
+    }
 
-    const text = decoder.decode(value);
     try {
       yield JSON.parse(text).choices[0].message.content;
     } catch (e) {

@@ -1,4 +1,5 @@
-const { addIconSelectors } = require("@iconify/tailwind");
+import { addIconSelectors } from "@iconify/tailwind";
+import typography from "@tailwindcss/typography";
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -7,7 +8,7 @@ export default {
     extend: {},
   },
   plugins: [
-    require("@tailwindcss/typography"),
+    typography(),
     addIconSelectors({
       prefixes: ["simple-line-icons"],
       scale: 1,

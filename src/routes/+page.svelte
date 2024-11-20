@@ -50,7 +50,9 @@
 
       const deltaReader = llmApi.query(tmpMsg);
 
+      let deltaCount = 0;
       for await (const delta of deltaReader) {
+        deltaCount++;
         tempQA.answer += delta;
       }
 
@@ -62,8 +64,14 @@
 
       isRespOngoing = false;
 
-      if (nearBottom()) {
+      if (deltaCount > 1 && nearBottom()) {
         scrollToBottom();
+      } else {
+        await tick();
+        chatContainer.lastElementChild?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
       }
 
       localStorage.setItem(KEY_CHAT_LOG, JSON.stringify(chatLog));
