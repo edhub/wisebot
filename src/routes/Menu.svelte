@@ -1,7 +1,6 @@
 <script lang="ts">
   import { fade, slide } from "svelte/transition";
   import BianXieApiConfig from "$lib/BianXieApiConfig.svelte";
-  import OllamaApiConfig from "$lib/OllamaApiConfig.svelte";
 
   let {
     showMenu = $bindable(false),
@@ -26,8 +25,6 @@
     >
       <div class="w-80 p-4">
         <BianXieApiConfig />
-
-        <OllamaApiConfig />
 
         <button class="w-full mt-12 p-2 bg-red-500 text-white rounded" onclick={clearChat}
           >清除聊天历史</button

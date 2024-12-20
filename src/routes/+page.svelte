@@ -2,7 +2,18 @@
   import { tick } from "svelte";
   import Message, { type QandA } from "./Message.svelte";
   import Menu from "./Menu.svelte";
-  import { llmApi } from "$lib/query_chooser";
+  import BianXieApi from "$lib/query_bian_xie";
+
+  let availableModels = [
+    "gpt-4o-mini",
+    "claude-3-5-sonnet-20241022",
+    "o1-mini",
+    "o1-all",
+    "o1-pro-all",
+  ];
+
+  let showModelButtons = $state(false);
+  let lastModel = $state(availableModels[0]);
 
   const KEY_CHAT_LOG = "chatLog2";
 
@@ -17,7 +28,7 @@
   async function resizeTextarea() {
     await tick();
     textarea.style.height = "auto";
-    let maxHeight = window.innerHeight * 0.8; // 80% of the window height
+    let maxHeight = window.innerHeight * 0.5; // 50% of the window height
     let desiredHeight = Math.min(textarea.scrollHeight, maxHeight);
     textarea.style.height = desiredHeight + "px";
   }
@@ -31,8 +42,10 @@
     textarea.focus();
   }
 
-  async function sendMessage() {
+  async function sendMessage(model: string) {
     const genId = () => Math.random().toString(36).substr(2, 9);
+
+    lastModel = model || lastModel;
 
     if (question.trim() !== "") {
       scrollToBottom();
@@ -42,13 +55,13 @@
       tempQA = {
         id: genId(),
         question: tmpMsg,
-        botName: llmApi.model,
+        botName: lastModel,
         answer: "",
       };
 
       isRespOngoing = true;
 
-      const deltaReader = llmApi.query(tmpMsg);
+      const deltaReader = BianXieApi.query(lastModel, tmpMsg);
 
       let deltaCount = 0;
       for await (const delta of deltaReader) {
@@ -102,7 +115,9 @@
   function nearBottom() {
     const threshold = 350; // distance from bottom in pixels
     const distanceFromBottom =
-      document.documentElement.scrollHeight - window.scrollY - window.innerHeight;
+      document.documentElement.scrollHeight -
+      window.scrollY -
+      window.innerHeight;
     return distanceFromBottom < threshold;
   }
   function shouldAutoScroll() {
@@ -125,6 +140,7 @@
     await tick();
     chatContainer.scrollIntoView({ behavior: "smooth", block: "end" });
   }
+
 </script>
 
 <div class="z-0 w-full h-full">
@@ -133,41 +149,84 @@
       <Message qandA={qa} onResendMessage={resendMessage} {deleteQA} />
     {/each}
     {#if isRespOngoing}
-      <Message qandA={tempQA} isRespOngoing={true} onResendMessage={resendMessage} />
+      <Message
+        qandA={tempQA}
+        isRespOngoing={true}
+        onResendMessage={resendMessage}
+      />
     {/if}
   </div>
 
   <form
-    class="chat-input fixed bottom-0 w-full bg-white flex items-start pb-3"
-    onsubmit={(e) => {
-      e.preventDefault();
-      if (!isRespOngoing) sendMessage();
+    class="chat-input fixed bottom-0 right-0 left-0 flex flex-col"
+    onfocusin={() => {
+      showModelButtons = true;
+    }}
+    onfocusout={() => {
+      setTimeout(() => {
+        showModelButtons = false;
+      }, 200);
     }}
   >
-    <textarea
-      bind:this={textarea}
-      id="chat-input"
-      placeholder="输入消息..."
-      bind:value={question}
-      class="m-2 p-2 resize-none rounded border flex-grow outline-none"
-      rows="2"
-      maxlength="4000"
-      onkeydown={async (e) => {
-        if (!isRespOngoing && e.key === "Enter" && e.keyCode === 13 && !e.altKey && !e.shiftKey) {
-          e.preventDefault();
-          sendMessage();
-          resizeTextarea();
-        }
-      }}
-      oninput={resizeTextarea}
-    ></textarea>
 
-    <button type="submit" class="m-2 ml-0 p-2 rounded bg-blue-400 hover:bg-blue-500 text-white">
-      <span class="iconify simple-line-icons--paper-plane text-2xl"></span>
-    </button>
+    {#if showModelButtons}
+      <div
+        class="self-end mr-2 bg-white rounded overflow-hidden border border-gray-200 w-40"
+      >
+        <ul>
+          {#each availableModels as model, i (model)}
+            <li>
+              <button
+                type="button"
+                class="w-full text-nowrap overflow-hidden text-ellipsis text-left h-10 px-2 py-1
+                  {lastModel === model ? 'bg-green-100 font-bold' : ''}
+                  hover:bg-green-50 active:bg-green-200
+                  border-b border-green-200 last:border-b-0
+                  transition-colors duration-150
+                  focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-inset"
+                onclick={() => {
+                  sendMessage(model);
+                  showModelButtons = false;
+                }}
+              >
+                {model}
+              </button>
+            </li>
+          {/each}
+        </ul>
+      </div>
+    {/if}
+
+    <div class="bg-white p-2">
+      <textarea
+        bind:this={textarea}
+        id="chat-input"
+        placeholder="输入消息..."
+        bind:value={question}
+        class="p-2 resize-none w-full rounded border flex-grow outline-none"
+        rows="2"
+        maxlength="4000"
+        onkeydown={async (e) => {
+          if (
+            !isRespOngoing &&
+            e.key === "Enter" &&
+            e.keyCode === 13 &&
+            !e.altKey &&
+            !e.shiftKey
+          ) {
+            e.preventDefault();
+            sendMessage(lastModel);
+            resizeTextarea();
+            textarea.blur();
+          }
+        }}
+        oninput={resizeTextarea}
+      ></textarea>
+    </div>
   </form>
 </div>
 
+<!-- svelte-ignore a11y_consider_explicit_label -->
 <button
   class="fixed top-0 right-0 m-2 p-2 rounded bg-blue-400 hover:bg-blue-500 text-white"
   onclick={() => (showMenu = true)}

@@ -2,7 +2,6 @@ export const KEY_BX_API_KEY = "key_bian_xie_api_key";
 export const KEY_BX_CHOSEN_MODEL = "key_bian_xie_chosen_model";
 
 let apiKey = localStorage.getItem(KEY_BX_API_KEY) || "";
-let chosenModel = localStorage.getItem(KEY_BX_CHOSEN_MODEL) || "gpt-4o-mini";
 
 function getApiKey() {
   return apiKey;
@@ -16,33 +15,19 @@ function setApiKey(key: string) {
   localStorage.setItem(KEY_BX_API_KEY, apiKey);
 }
 
-function getModel() {
-  return chosenModel;
-}
-
-function setModel(model: string) {
-  if (chosenModel === model) {
-    return;
-  }
-
-  chosenModel = model;
-  localStorage.setItem(KEY_BX_CHOSEN_MODEL, model);
-}
-
 const SERVER_URL = "https://api.bianxie.ai/v1/chat/completions";
 
-async function* queryBianXie(prompt: string = "Hi", temprature: number = 0.7) {
+async function* queryBianXie(model: string, prompt: string = "Hi", temprature: number = 0.7) {
   if (!apiKey) {
     yield "API key is not set.";
     return;
   }
 
   // o1mini 不用 stream 整体速度会快很多。
-  const stream = chosenModel.startsWith("o1-mini") ? false : true;
-  // const stream = false;
+  const stream = model.startsWith("o1") ? false : true;
 
   const body = JSON.stringify({
-    model: chosenModel,
+    model: model,
     messages: [{ role: "user", content: prompt }],
     temprature: temprature,
     stream,
@@ -129,8 +114,6 @@ async function* queryBianXie(prompt: string = "Hi", temprature: number = 0.7) {
 const BianXieApi = {
   getApiKey,
   setApiKey,
-  getModel,
-  setModel,
   query: queryBianXie,
 };
 
