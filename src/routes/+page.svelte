@@ -3,6 +3,7 @@
   import Message, { type QandA } from "./Message.svelte";
   import Menu from "./Menu.svelte";
   import BianXieApi from "$lib/query_bian_xie";
+  import MessageFolded from "./MessageFolded.svelte";
 
   let availableModels = [
     "gpt-4o-mini",
@@ -86,10 +87,12 @@
           block: "start",
         });
       }
-
-      localStorage.setItem(KEY_CHAT_LOG, JSON.stringify(chatLog));
     }
   }
+
+  $effect(() => {
+    localStorage.setItem(KEY_CHAT_LOG, JSON.stringify(chatLog));
+  });
 
   let chatContainer: HTMLDivElement;
   $effect(() => {
@@ -133,26 +136,51 @@
 
   function deleteQA(qa: QandA) {
     chatLog = chatLog.filter((q) => q.id !== qa.id);
-    localStorage.setItem(KEY_CHAT_LOG, JSON.stringify(chatLog));
+  }
+
+  function toggleFavorite(qa: QandA) {
+    qa.favorite = !qa.favorite;
+  }
+
+  let foldAll = true;
+  function toggleFold(qa: QandA) {
+    qa.folded = !qa.folded;
   }
 
   async function scrollToBottom() {
     await tick();
     chatContainer.scrollIntoView({ behavior: "smooth", block: "end" });
   }
-
 </script>
 
 <div class="z-0 w-full h-full">
   <div bind:this={chatContainer} class=" flex flex-col overflow-y-auto pb-24">
     {#each chatLog as qa (qa.id)}
-      <Message qandA={qa} onResendMessage={resendMessage} {deleteQA} />
+      {#if qa.folded}
+        <MessageFolded
+          qandA={qa}
+          deleteMsg={deleteQA}
+          {toggleFavorite}
+          {toggleFold}
+        />
+      {:else}
+        <Message
+          qandA={qa}
+          onResendMessage={resendMessage}
+          {deleteQA}
+          {toggleFavorite}
+          {toggleFold}
+        />
+      {/if}
     {/each}
     {#if isRespOngoing}
       <Message
         qandA={tempQA}
         isRespOngoing={true}
         onResendMessage={resendMessage}
+        {deleteQA}
+        {toggleFavorite}
+        {toggleFold}
       />
     {/if}
   </div>
@@ -168,7 +196,6 @@
       }, 200);
     }}
   >
-
     {#if showModelButtons}
       <div
         class="self-end mr-2 bg-white rounded overflow-hidden border border-gray-200 w-40"
@@ -179,11 +206,11 @@
               <button
                 type="button"
                 class="w-full text-nowrap overflow-hidden text-ellipsis text-left h-10 px-2 py-1
-                  {lastModel === model ? 'bg-green-100 font-bold' : ''}
-                  hover:bg-green-50 active:bg-green-200
-                  border-b border-green-200 last:border-b-0
+                  {lastModel === model ? 'bg-blue-100 font-bold' : ''}
+                  hover:bg-blue-200 active:bg-blue-200
+                  border-b border-blue-200 last:border-b-0
                   transition-colors duration-150
-                  focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-inset"
+                  focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-inset"
                 onclick={() => {
                   sendMessage(model);
                   showModelButtons = false;
@@ -228,16 +255,30 @@
 
 <!-- svelte-ignore a11y_consider_explicit_label -->
 <button
-  class="fixed top-0 right-0 m-2 p-2 rounded bg-blue-400 hover:bg-blue-500 text-white"
+  class="fixed bottom-80 right-0 mr-2 p-2 rounded bg-gray-200 hover:bg-blue-300 text-white"
   onclick={() => (showMenu = true)}
 >
-  <span class="iconify simple-line-icons--menu text-2xl"> </span>
+  <span class="iconify simple-line-icons--menu text-xl"> </span>
+</button>
+
+<!-- svelte-ignore a11y_consider_explicit_label -->
+<button
+  class="fixed bottom-64 right-0 mr-2 p-2 rounded bg-gray-200 hover:bg-blue-300 text-white"
+  onclick={() => {
+    if (foldAll) {
+      chatLog.forEach((q) => (q.folded = false));
+    } else {
+      chatLog.forEach((q) => (q.folded = true));
+    }
+    foldAll = !foldAll;
+  }}
+>
+  <span class="iconify simple-line-icons--layers text-xl"> </span>
 </button>
 
 <Menu
   bind:showMenu
   clearChat={() => {
-    chatLog = [];
-    localStorage.removeItem(KEY_CHAT_LOG);
+    chatLog = chatLog.filter((q) => q.favorite);
   }}
 />

@@ -5,6 +5,8 @@
     question: string;
     botName?: string;
     answer: string;
+    folded?: boolean;
+    favorite?: boolean;
   }
 </script>
 
@@ -21,12 +23,16 @@
     qandA,
     isRespOngoing = false,
     onResendMessage = () => {},
+    toggleFavorite,
+    toggleFold,
     deleteQA,
   }: {
     qandA: QandA;
     isRespOngoing?: boolean;
     onResendMessage?: (message: string) => void;
-    deleteQA?: (qa: QandA) => void;
+    deleteQA: (qa: QandA) => void;
+    toggleFavorite: (qa: QandA) => void;
+    toggleFold: (qa: QandA) => void;
   } = $props();
 
   function highlight(code: string, lang: string) {
@@ -68,9 +74,11 @@
   // @ts-ignore
   marked.use({ renderer });
 
-  marked.use(markedKatex({
-    throwOnError: false,
-  }));
+  marked.use(
+    markedKatex({
+      throwOnError: false,
+    }),
+  );
 
   let showActionButtons = $state(false);
 
@@ -106,13 +114,6 @@
     document.body.removeChild(textArea);
   }
 
-  function deleteMsg(qa: QandA) {
-    if (deleteQA) {
-      deleteQA(qa);
-      toast.show("已删除");
-    }
-  }
-
   let toast: { show: (msg: string) => void } = getContext("toast");
 </script>
 
@@ -128,37 +129,75 @@
 <div
   class="rounded-md mx-2 my-2 border-gray-200 border shadow-sm"
   onmouseover={() => {
-    showActionButtons = true;
+    showActionButtons = !isRespOngoing;
   }}
   onfocus={() => {
-    showActionButtons = true;
+    showActionButtons = !isRespOngoing;
   }}
   onmouseleave={() => {
     showActionButtons = false;
   }}
 >
-  <div class="px-4 py-3 border-b border-gray-200">
+  <div class="px-4 pt-3">
     <p class="relative font-bold text-blue-500">
       {qandA.userName ? qandA.userName : "User"}
+
+      {#if showActionButtons || qandA.favorite}
+        <!-- svelte-ignore a11y_consider_explicit_label -->
+        <button
+          class="p-0 text-lg text-blue-400 float-right"
+          transition:fade={{ duration: 300 }}
+          onclick={() => {
+            toggleFavorite(qandA);
+          }}
+        >
+          <span
+            class="{qandA.favorite
+              ? 'text-red-500'
+              : 'text-gray-500'} font-bold iconify simple-line-icons--star full"
+          >
+          </span>
+        </button>
+      {/if}
       {#if showActionButtons}
-        <span transition:fade={{ duration: 300 }}>
-          <button
-            class="ml-4 p-0 text-xs text-blue-400"
-            onclick={() => {
-              copyToClipboard(qandA.question);
-            }}
-          >
-            复制
-          </button>
-          <button
-            class="ml-2 p-0 text-xs text-blue-400"
-            onclick={() => {
-              onResendMessage(qandA.question);
-            }}
-          >
-            再次发送
-          </button>
-        </span>
+        <button
+          class="ml-4 p-0 text-xs text-blue-400"
+          transition:fade={{ duration: 300 }}
+          onclick={() => {
+            copyToClipboard(qandA.question);
+          }}
+        >
+          复制
+        </button>
+        <button
+          class="ml-2 p-0 text-xs text-blue-400"
+          transition:fade={{ duration: 300 }}
+          onclick={() => {
+            onResendMessage(qandA.question);
+          }}
+        >
+          再次发送
+        </button>
+
+        <button
+          class="p-0 mr-4 text-xs text-blue-400 float-right"
+          transition:fade={{ duration: 300 }}
+          onclick={() => {
+            toggleFold(qandA);
+          }}
+        >
+          折叠
+        </button>
+
+        <button
+          class="mr-8 p-0 text-xs text-blue-400 float-right"
+          transition:fade={{ duration: 300 }}
+          onclick={() => {
+            deleteQA(qandA);
+          }}
+        >
+          删除
+        </button>
       {/if}
     </p>
     <article class="prose mt-2 max-w-none" onclick={handleUrlNavigation}>
@@ -178,14 +217,6 @@
             }}
           >
             复制
-          </button>
-          <button
-            class="ml-2 p-0 text-xs text-blue-400"
-            onclick={() => {
-              deleteMsg(qandA);
-            }}
-          >
-            删除
           </button>
         </span>
       {/if}
