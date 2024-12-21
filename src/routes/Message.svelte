@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   export interface QandA {
     id: string;
     userName?: string;
@@ -11,6 +11,7 @@
 <script lang="ts">
   import { marked } from "marked";
   import hljs from "highlight.js";
+  import markedKatex from "marked-katex-extension";
   import "highlight.js/styles/github-dark-dimmed.min.css";
 
   import { fade } from "svelte/transition";
@@ -50,7 +51,14 @@
       if (!lang || !langPrefix) {
         return "<pre><code>" + _code + "</code></pre>\n";
       }
-      return '<pre><code class="' + langPrefix + lang + '">' + _code + "</code></pre>\n";
+      return (
+        '<pre><code class="' +
+        langPrefix +
+        lang +
+        '">' +
+        _code +
+        "</code></pre>\n"
+      );
     },
     link(href: string, title: string | null | undefined, text: string): string {
       return `<a href="${href}">${text}</a>`;
@@ -59,6 +67,10 @@
 
   // @ts-ignore
   marked.use({ renderer });
+
+  marked.use(markedKatex({
+    throwOnError: false,
+  }));
 
   let showActionButtons = $state(false);
 
@@ -103,6 +115,15 @@
 
   let toast: { show: (msg: string) => void } = getContext("toast");
 </script>
+
+<svelte:head>
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css"
+    integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71HotJqlAn"
+    crossorigin="anonymous"
+  />
+</svelte:head>
 
 <div
   class="rounded-md mx-2 my-2 border-gray-200 border shadow-sm"

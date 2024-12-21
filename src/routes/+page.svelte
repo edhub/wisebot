@@ -8,8 +8,8 @@
     "gpt-4o-mini",
     "claude-3-5-sonnet-20241022",
     "o1-mini",
-    "o1-all",
-    "o1-pro-all",
+    // "o1-all",
+    // "o1-pro-all",
   ];
 
   let showModelButtons = $state(false);
