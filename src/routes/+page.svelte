@@ -8,7 +8,9 @@
   let availableModels = [
     "gpt-4o-mini",
     "claude-3-5-sonnet-20241022",
+    "gpt-4o-all",
     "o1-mini",
+    // "o1-mini-all",
     // "o1-all",
     // "o1-pro-all",
   ];
@@ -142,9 +144,23 @@
     qa.favorite = !qa.favorite;
   }
 
-  let foldAll = true;
+  let foldAll = false;
   function toggleFold(qa: QandA) {
     qa.folded = !qa.folded;
+  }
+
+  let modelButtonsTimer: number;
+  function toggleModelButtons(show: boolean) {
+    if (show) {
+      showModelButtons = true;
+      if (modelButtonsTimer) {
+        clearTimeout(modelButtonsTimer);
+      }
+    } else {
+      modelButtonsTimer = setTimeout(() => {
+        showModelButtons = false;
+      }, 200);
+    }
   }
 
   async function scrollToBottom() {
@@ -188,12 +204,10 @@
   <form
     class="chat-input fixed bottom-0 right-0 left-0 flex flex-col"
     onfocusin={() => {
-      showModelButtons = true;
+      toggleModelButtons(true);
     }}
     onfocusout={() => {
-      setTimeout(() => {
-        showModelButtons = false;
-      }, 200);
+      toggleModelButtons(false);
     }}
   >
     {#if showModelButtons}
@@ -213,6 +227,8 @@
                   focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-inset"
                 onclick={() => {
                   sendMessage(model);
+                  resizeTextarea();
+                  textarea.blur();
                   showModelButtons = false;
                 }}
               >
@@ -244,7 +260,6 @@
             e.preventDefault();
             sendMessage(lastModel);
             resizeTextarea();
-            textarea.blur();
           }
         }}
         oninput={resizeTextarea}

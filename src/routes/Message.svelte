@@ -190,6 +190,26 @@
         </button>
 
         <button
+          class="p-0 mr-4 text-xs text-blue-400 float-right"
+          transition:fade={{ duration: 300 }}
+          onclick={() => {
+            const tags = "wise-bot";
+            const title = encodeURIComponent(
+              qandA.question.length > 30
+                ? qandA.question.substring(0, 25) + "..."
+                : qandA.question,
+            );
+            const text = encodeURIComponent(
+              `**问题：** ${qandA.question}\n来自 **${qandA.botName}** 的回答：\n---\n${qandA.answer}`,
+            );
+
+            window.location.href = `bear://x-callback-url/create?&tags=${tags}&title=${title}&text=${text}`;
+          }}
+        >
+          Bear
+        </button>
+
+        <button
           class="mr-8 p-0 text-xs text-blue-400 float-right"
           transition:fade={{ duration: 300 }}
           onclick={() => {
