@@ -18,7 +18,7 @@
 </script>
 
 <div
-  class="rounded-md mx-2 my-1 border-gray-200 border shadow-sm"
+  class="rounded-md mx-1 my-1 border-gray-200 border shadow-sm"
   onmouseover={() => {
     showActionButtons = true;
   }}
@@ -29,13 +29,13 @@
     showActionButtons = false;
   }}
 >
-  <div class="px-4 py-3">
+  <div class="px-4 pt-2 pb-1">
     <p class="text-sm">
       <span class="text-nowrap inline-block w-2/3 overflow-hidden text-ellipsis whitespace-nowrap text-gray-800">
         {qandA.question}
       </span>
 
-      <span class="font-bold">
+      <span >
         {#if showActionButtons || qandA.favorite}
           <button
             class="p-0 text-lg text-blue-400 float-right"
@@ -44,7 +44,7 @@
           >
             <span
               class="{qandA.favorite
-                ? 'text-yellow-500'
+                ? 'text-red-500'
                 : 'text-gray-500'} font-bold iconify simple-line-icons--star"
             />
           </button>
@@ -52,7 +52,7 @@
 
         {#if showActionButtons}
           <button
-            class="p-0 mr-4 text-xs text-blue-400 float-right"
+            class="p-0 mr-4 text-xs text-gray-400 float-right"
             transition:fade={{ duration: 300 }}
             onclick={() => toggleFold(qandA)}
           >
@@ -60,7 +60,7 @@
           </button>
 
           <button
-            class="mr-8 p-0 text-xs text-blue-400 float-right"
+            class="mr-8 p-0 text-xs text-gray-500 float-right"
             transition:fade={{ duration: 300 }}
             onclick={() => deleteMsg(qandA)}
           >

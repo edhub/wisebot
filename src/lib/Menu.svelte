@@ -1,6 +1,8 @@
 <script lang="ts">
   import { fade, slide } from "svelte/transition";
   import BianXieApiConfig from "./BianXieApiConfig.svelte";
+  import { chatLog } from "./ChatStore";
+  import type { QandA } from "./ChatStore";
 
   let {
     showMenu = $bindable(false),
@@ -36,7 +38,7 @@
         <hr class="my-2" />
         <ul class="list-disc list-inside mx-2">
           <li>
-            <b>DeepSeekV3</b> 国产模型，性能不错。
+            <b>DeepSeekV3</b> 国产模型，性能不错，性价比高，优先推荐使用。
           </li>
           <li>
             <b>o1-mini</b> 能力最强，性价比也很高，但稍微慢一点，有时候会超时。
@@ -51,10 +53,22 @@
       </div>
       <div class="w-80 p-4">
         <button
-          class="w-full mt-12 p-2 bg-red-500 text-white rounded"
-          onclick={clearChat}>清除聊天历史</button
+          class="w-full p-2 bg-gray-100 text-gray-600 rounded hover:bg-gray-200"
+          onclick={() => {
+            chatLog.update((log: QandA[]) =>
+              log.map((qa) => ({ ...qa, folded: true })),
+            );
+            showMenu = false;
+          }}>折叠全部消息</button
+        >
+        <button
+          class="w-full mt-4 p-2 bg-red-500 text-white rounded hover:bg-red-600"
+          onclick={() => {
+            clearChat();
+            showMenu = false;
+          }}>清除聊天历史</button
         >
       </div>
     </div>
   </div>
-{/if} 
+{/if}

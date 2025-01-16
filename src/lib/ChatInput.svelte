@@ -102,7 +102,7 @@
       oninput={resizeTextarea}
     ></textarea>
     <div
-      class="flex items-center gap-2 text-sm text-gray-500 w-3/4 overflow-scroll"
+      class="flex items-center gap-2 text-xs text-gray-500 w-4/5 overflow-scroll"
     >
       {#each availableModels as model, i}
         <button

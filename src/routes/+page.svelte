@@ -16,11 +16,16 @@
     $tempQA = {
       id: generateId(),
       question: message,
-      botName: MODELS[model].displayName,
       answer: "",
+      botName: MODELS[model].displayName,
       timestamp: Date.now(),
+      favorite: false,
+      folded: false,
+      firstResponseTime: undefined,
+      completionTime: undefined
     };
 
+    const startTime = Date.now();
     $isRespOngoing = true;
 
     await tick();
@@ -31,11 +36,18 @@
 
     const deltaReader = query(model, message);
     let deltaCount = 0;
+    let isFirstResponse = true;
 
     for await (const delta of deltaReader) {
+      if (isFirstResponse) {
+        $tempQA.firstResponseTime = Date.now() - startTime;
+        isFirstResponse = false;
+      }
       deltaCount++;
       $tempQA.answer += delta;
     }
+
+    $tempQA.completionTime = Date.now() - startTime;
 
     if ($tempQA.answer.length === 0) {
       $tempQA.answer = "好像出错啦";
@@ -73,7 +85,7 @@
       class="absolute right-0 bottom-0 m-2 p-2 rounded bg-gray-200 hover:bg-blue-300 text-gray-600"
       on:click={() => (showMenu = true)}
     >
-      <span class="iconify simple-line-icons--menu text-xl"> </span>
+      <span class="iconify simple-line-icons--menu text-sm"> </span>
     </button>
   </div>
   <div class="mt-32">

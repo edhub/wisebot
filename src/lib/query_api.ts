@@ -10,7 +10,13 @@ export async function* query(
   const apiKey = getApiKey(modelConfig.serverType);
 
   if (!apiKey) {
-    yield "API key is not set.";
+    yield "请设置 API key。\n";
+    if (modelConfig.serverType === 'deepseek') {
+      yield "请在 https://platform.deepseek.com/ 购买 API 调用，然后设置 API key";
+    }
+    if (modelConfig.serverType === 'bianxie') {
+      yield "请在 https://api.bianxie.ai 购买 API 调用，然后设置 API key";
+    }
     return;
   }
 

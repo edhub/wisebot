@@ -22,12 +22,6 @@ export interface ModelConfig {
 }
 
 export const MODELS: Record<string, ModelConfig> = {
-  'gpt-4o-mini': {
-    displayName: 'gpt-4o-mini',
-    serverType: 'bianxie',
-    requiresStream: false,
-    defaultTemperature: 0.7,
-  },
   'deepseek-chat': {
     displayName: 'DeepSeekV3',
     serverType: 'deepseek',

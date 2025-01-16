@@ -5,12 +5,15 @@ export interface QandA {
   question: string;
   answer: string;
   botName?: string;
+  userName?: string;
   favorite?: boolean;
   folded?: boolean;
   timestamp?: number;
+  firstResponseTime?: number;  // 第一个字符返回的时间
+  completionTime?: number;    // 请求完成的时间
 }
 
-export const KEY_CHAT_LOG = "chatLog6";
+export const KEY_CHAT_LOG = "chatLog2";
 
 // 初始化聊天记录
 const storedChatLog = localStorage.getItem(KEY_CHAT_LOG);
