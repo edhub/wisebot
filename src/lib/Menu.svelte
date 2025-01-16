@@ -1,6 +1,6 @@
 <script lang="ts">
   import { fade, slide } from "svelte/transition";
-  import BianXieApiConfig from "$lib/BianXieApiConfig.svelte";
+  import BianXieApiConfig from "./BianXieApiConfig.svelte";
 
   let {
     showMenu = $bindable(false),
@@ -17,19 +17,17 @@
       showMenu = false;
     }}
     transition:fade={{ duration: 250 }}
-    class="fixed left-0 top-0 w-full h-full bg-gray-800 bg-opacity-50"
+    class="fixed left-0 top-0 w-full h-full bg-gray-800 bg-opacity-50 z-50"
   >
     <div
+      onclick={(e) => {
+        e.stopPropagation();
+      }}
       transition:slide={{ duration: 250, axis: "x" }}
       class="fixed top-0 right-0 h-full w-80 overflow-auto bg-white border-l border-gray-200"
     >
       <div class="w-80 p-4">
         <BianXieApiConfig />
-
-        <button
-          class="w-full mt-12 p-2 bg-red-500 text-white rounded"
-          onclick={clearChat}>清除聊天历史</button
-        >
       </div>
       <div class="p-4 w-80">
         <div class="flex flex-row items-baseline">
@@ -38,19 +36,25 @@
         <hr class="my-2" />
         <ul class="list-disc list-inside mx-2">
           <li>
-            <b>gpt-4o-mini</b> 便宜好用，简单的问题可以应付。
-          </li>
-          <li>
-            <b>claude-3-5-sonnet-20241022</b> 能力够强，需要靠谱点的答案可以选它。
-          </li>
-          <li>
-            <b>gpt-4o-all</b> 能力和 claude-3-5-sonnet 差不多，但可以画图，以及访问网页。
+            <b>DeepSeekV3</b> 国产模型，性能不错。
           </li>
           <li>
             <b>o1-mini</b> 能力最强，性价比也很高，但稍微慢一点，有时候会超时。
           </li>
+          <li>
+            <b>Claude3.5</b> 能力够强，需要靠谱点的答案可以选它。代码王者。
+          </li>
+          <li>
+            <b>gpt-4o-all</b> 可以画图，访问网络。
+          </li>
         </ul>
+      </div>
+      <div class="w-80 p-4">
+        <button
+          class="w-full mt-12 p-2 bg-red-500 text-white rounded"
+          onclick={clearChat}>清除聊天历史</button
+        >
       </div>
     </div>
   </div>
-{/if}
+{/if} 

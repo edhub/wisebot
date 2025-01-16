@@ -1,6 +1,6 @@
 <script lang="ts">
   import "../app.css";
-  import Toast from "./Toast.svelte";
+  import Toast from "../lib/Toast.svelte";
   import { setContext } from "svelte";
 
   let { children } = $props();

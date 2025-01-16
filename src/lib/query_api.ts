@@ -1,41 +1,31 @@
-export const KEY_BX_API_KEY = "key_bian_xie_api_key";
-export const KEY_BX_CHOSEN_MODEL = "key_bian_xie_chosen_model";
+import { getModelConfig, getServerConfig, getApiKey } from './model_config';
 
-let apiKey = localStorage.getItem(KEY_BX_API_KEY) || "";
+export async function* query(
+  model: string,
+  prompt: string = "Hi",
+  temperature: number = 0.7,
+) {
+  const modelConfig = getModelConfig(model);
+  const serverConfig = getServerConfig(modelConfig.serverType);
+  const apiKey = getApiKey(modelConfig.serverType);
 
-function getApiKey() {
-  return apiKey;
-}
-
-function setApiKey(key: string) {
-  if (apiKey === key) {
-    return;
-  }
-  apiKey = key;
-  localStorage.setItem(KEY_BX_API_KEY, apiKey);
-}
-
-const SERVER_URL = "https://api.bianxie.ai/v1/chat/completions";
-
-async function* queryBianXie(model: string, prompt: string = "Hi", temprature: number = 0.7) {
   if (!apiKey) {
     yield "API key is not set.";
     return;
   }
 
-  // o1mini 不用 stream 整体速度会快很多。
-  const stream = model.startsWith("o1") ? false : true;
+  const stream = modelConfig.requiresStream;
 
   const body = JSON.stringify({
     model: model,
     messages: [{ role: "user", content: prompt }],
-    temprature: temprature,
+    temperature: temperature,
     stream,
   });
 
   let resp;
   try {
-    resp = await fetch(SERVER_URL, {
+    resp = await fetch(serverConfig.baseUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -56,9 +46,8 @@ async function* queryBianXie(model: string, prompt: string = "Hi", temprature: n
 
   const decoder = new TextDecoder();
 
-  let tailing = "";
-
   if (stream) {
+    let tailing = "";
     while (true) {
       const { done, value } = await reader.read();
 
@@ -66,7 +55,6 @@ async function* queryBianXie(model: string, prompt: string = "Hi", temprature: n
         break;
       }
 
-      // split the response by newline, and filter empty strings
       let textDelta = tailing + decoder.decode(value);
       let splits = textDelta
         .split("\n")
@@ -75,10 +63,7 @@ async function* queryBianXie(model: string, prompt: string = "Hi", temprature: n
 
       const badEnd = !(textDelta.endsWith("]}") || textDelta.endsWith("[DONE]"));
       tailing = badEnd ? splits.splice(splits.length - 1, 1)[0] : "";
-      if (badEnd) {
-        console.log(tailing);
-      }
-
+      
       try {
         let delta = splits
           .map((s) => {
@@ -89,8 +74,8 @@ async function* queryBianXie(model: string, prompt: string = "Hi", temprature: n
           .join("");
         yield delta;
       } catch (e) {
-        console.log(e);
-        console.log(textDelta);
+        console.error("Error parsing stream response:", e);
+        console.log("Raw response:", textDelta);
       }
     }
   } else {
@@ -106,15 +91,9 @@ async function* queryBianXie(model: string, prompt: string = "Hi", temprature: n
     try {
       yield JSON.parse(text).choices[0].message.content;
     } catch (e) {
-      console.log(text);
+      console.error("Error parsing non-stream response:", e);
+      console.log("Raw response:", text);
     }
   }
 }
 
-const BianXieApi = {
-  getApiKey,
-  setApiKey,
-  query: queryBianXie,
-};
-
-export default BianXieApi;

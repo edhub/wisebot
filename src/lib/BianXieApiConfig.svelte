@@ -1,26 +1,42 @@
 <script lang="ts">
-  import { getContext } from "svelte";
   import InplaceEdit from "./InplaceEdit.svelte";
-  import bianXieApi from "./query_bian_xie";
+  import { getApiKey, setApiKey } from "./model_config";
 
-  let apiKey = $state(bianXieApi.getApiKey());
+  let deepseekApiKey = $state(getApiKey('deepseek'));
+  let bianxieApiKey = $state(getApiKey('bianxie'));
 
   $effect(() => {
-    return () => {
-      bianXieApi.setApiKey(apiKey);
-    };
+    setApiKey('deepseek', deepseekApiKey);
+  });
+
+  $effect(() => {
+    setApiKey('bianxie', bianxieApiKey);
   });
 </script>
 
-<div class="flex flex-row items-baseline">
-  <p class="text-lg font-bold">便携API</p>
-</div>
-<hr class="my-2" />
+<div class="flex flex-col gap-4">
+  <div>
+    <p class="text-lg font-bold">API 配置</p>
+    <hr class="my-2" />
+  </div>
 
-<p class="mt-2 mb-1">API KEY</p>
-<div
-  onclick={(e) => e.stopPropagation()}
-  class="rounded bg-gray-200 p-2 overflow-clip"
->
-  <InplaceEdit bind:value={apiKey} />
+  <div>
+    <p class="mt-2 mb-1">Deepseek API Key</p>
+    <div
+      onclick={(e) => e.stopPropagation()}
+      class="rounded bg-gray-200 p-2 overflow-clip"
+    >
+      <InplaceEdit bind:value={deepseekApiKey} />
+    </div>
+  </div>
+
+  <div>
+    <p class="mt-2 mb-1">便携 API Key</p>
+    <div
+      onclick={(e) => e.stopPropagation()}
+      class="rounded bg-gray-200 p-2 overflow-clip"
+    >
+      <InplaceEdit bind:value={bianxieApiKey} />
+    </div>
+  </div>
 </div>
