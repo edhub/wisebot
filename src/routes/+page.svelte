@@ -88,7 +88,7 @@
       <span class="iconify simple-line-icons--menu text-sm"> </span>
     </button>
   </div>
-  <div class="mt-32">
+  <div class="mt-28">
     <ChatContainer resendMessage={handleResendMessage} />
   </div>
 </div>

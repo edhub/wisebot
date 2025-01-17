@@ -182,6 +182,7 @@
 </script>
 
 <div
+  role="article"
   class="mx-1 my-2"
   onmouseover={() => {
     showActionButtons = !isRespOngoing;
@@ -280,7 +281,7 @@
       {/if}
     </div>
   </div>
-  <div class="pt-2 rounded-md border-gray-200 border shadow-sm">
+  <div class="pt-2 rounded-md border-gray-200 border">
     <article class="prose px-4 max-w-none" onclick={handleUrlNavigation}>
       {@html marked.parse(qandA.question)}
     </article>
@@ -304,7 +305,7 @@
         {/if}
       </div>
       <hr class="w-1/3" />
-      <article class="prose mt-5 max-w-none" onclick={handleUrlNavigation}>
+      <article class="prose mt-5 pb-2 max-w-none" onclick={handleUrlNavigation}>
         {#if qandA.answer.length === 0 && isRespOngoing}
           <div class="flex items-center gap-2">
             <div class="blink">_</div>

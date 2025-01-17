@@ -2,43 +2,20 @@
   import { tick } from "svelte";
   import Message from "./Message.svelte";
   import MessageFolded from "./MessageFolded.svelte";
-  import { chatLog, isRespOngoing, tempQA, deleteQA, toggleFavorite, toggleFold } from "./ChatStore";
+  import {
+    chatLog,
+    isRespOngoing,
+    tempQA,
+    deleteQA,
+    toggleFavorite,
+    toggleFold,
+  } from "./ChatStore";
 
   let { resendMessage } = $props<{
     resendMessage: (msg: string) => void;
   }>();
 
   let chatContainer: HTMLDivElement;
-  let scrollTime = 0;
-
-  function nearTop() {
-    const threshold = 350;
-    return window.scrollY < threshold;
-  }
-
-  function shouldAutoScroll() {
-    const isScrolling = Date.now() - scrollTime < 70;
-    return $isRespOngoing && nearTop() && !isScrolling;
-  }
-
-  async function scrollToTop() {
-    await tick();
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  $effect(() => {
-    const updateScrollTime = () => (scrollTime = Date.now());
-    window.addEventListener("scroll", updateScrollTime);
-    return () => window.removeEventListener("scroll", updateScrollTime);
-  });
-
-  $effect(() => {
-    if ($tempQA.answer && shouldAutoScroll()) {
-      scrollToTop();
-    }
-  });
-
-//   const reversedChatLog = $derived([...$chatLog].reverse());
 </script>
 
 <svelte:head>
@@ -79,4 +56,4 @@
       />
     {/if}
   {/each}
-</div> 
+</div>

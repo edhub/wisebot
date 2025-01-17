@@ -18,7 +18,7 @@
 </script>
 
 <div
-  class="rounded-md mx-1 my-1 border-gray-200 border shadow-sm"
+  class="rounded-md mx-1 my-1 border-gray-200 border"
   onmouseover={() => {
     showActionButtons = true;
   }}

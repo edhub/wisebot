@@ -109,7 +109,7 @@
           type="button"
           class="px-2 py-2 rounded transition-colors duration-150 whitespace-nowrap {lastModel ===
           model
-            ? 'bg-blue-100 text-blue-700 font-bold'
+            ? 'bg-gray-200 font-bold'
             : 'bg-gray-100 hover:bg-gray-200'}"
           onclick={() => {
             if (question.trim()) {
