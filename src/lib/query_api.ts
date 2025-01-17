@@ -1,8 +1,10 @@
+import type { QandA } from './ChatStore';
 import { getModelConfig, getServerConfig, getApiKey } from './model_config';
 
 export async function* query(
   model: string,
-  prompt: string = "Hi",
+  message: string,
+  lastQA?: QandA,
   temperature: number = 0.7,
 ) {
   const modelConfig = getModelConfig(model);
@@ -22,9 +24,17 @@ export async function* query(
 
   const stream = modelConfig.requiresStream;
 
+  const messages = lastQA ? [
+    { role: "user", content: lastQA.question },
+    { role: "assistant", content: lastQA.answer },
+    { role: "user", content: message },
+  ] : [
+    { role: "user", content: message },
+  ];
+
   const body = JSON.stringify({
     model: model,
-    messages: [{ role: "user", content: prompt }],
+    messages,
     temperature: temperature,
     stream,
   });

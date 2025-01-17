@@ -9,10 +9,12 @@
     deleteQA,
     toggleFavorite,
     toggleFold,
+    type QandA,
   } from "./ChatStore";
 
-  let { resendMessage } = $props<{
+  let { resendMessage, onFollowUp} = $props<{
     resendMessage: (msg: string) => void;
+    onFollowUp: (qa: QandA) => void;
   }>();
 
   let chatContainer: HTMLDivElement;
@@ -53,6 +55,7 @@
         {deleteQA}
         {toggleFavorite}
         {toggleFold}
+        {onFollowUp}
       />
     {/if}
   {/each}

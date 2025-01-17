@@ -15,6 +15,7 @@
     toggleFavorite,
     toggleFold,
     deleteQA,
+    onFollowUp,
   }: {
     qandA: QandA;
     isRespOngoing?: boolean;
@@ -22,6 +23,7 @@
     deleteQA: (qa: QandA) => void;
     toggleFavorite: (qa: QandA) => void;
     toggleFold: (qa: QandA) => void;
+    onFollowUp?: (qa: QandA) => void;
   } = $props();
 
   function highlight(code: string, lang: string) {
@@ -197,6 +199,15 @@
   <div class="flex text-xs text-gray-400">
     <div class="h-6 flex-1 flex items-center space-x-3 pl-1">
       {#if showActionButtons}
+        <button
+          transition:fade={{ duration: 300 }}
+          onclick={() => {
+            onFollowUp?.(qandA);
+          }}
+        >
+          追问
+        </button>
+
         <button
           transition:fade={{ duration: 300 }}
           onclick={() => {

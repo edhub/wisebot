@@ -8,7 +8,6 @@ export interface QandA {
   userName?: string;
   favorite?: boolean;
   folded?: boolean;
-  timestamp?: number;
   firstResponseTime?: number;  // 第一个字符返回的时间
   completionTime?: number;    // 请求完成的时间
 }

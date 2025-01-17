@@ -4,13 +4,13 @@
   import ChatContainer from "$lib/ChatContainer.svelte";
   import ChatInput from "$lib/ChatInput.svelte";
   import Menu from "$lib/Menu.svelte";
-  import { chatLog, isRespOngoing, tempQA, generateId } from "$lib/ChatStore";
+  import { chatLog, isRespOngoing, tempQA, generateId, type QandA } from "$lib/ChatStore";
   import { MODELS } from "$lib/model_config";
 
   let showMenu = $state(false);
   let chatInput: ChatInput;
 
-  async function handleSendMessage(model: string, message: string) {
+  async function handleSendMessage(model: string, message: string, lastQA?: QandA) {
     if (message.trim() === "") return;
 
     $tempQA = {
@@ -18,12 +18,7 @@
       question: message,
       answer: "",
       botName: MODELS[model].displayName,
-      timestamp: Date.now(),
-      favorite: false,
-      folded: false,
-      firstResponseTime: undefined,
-      completionTime: undefined
-    };
+    } as QandA;
 
     const startTime = Date.now();
     $isRespOngoing = true;
@@ -34,7 +29,7 @@
       behavior: "smooth",
     });
 
-    const deltaReader = query(model, message);
+    const deltaReader = query(model, message, lastQA);
     let deltaCount = 0;
     let isFirstResponse = true;
 
@@ -65,6 +60,10 @@
     chatInput?.setQuestion(message);
   }
 
+  function handleFollowUp(qa: QandA) {
+    chatInput?.setQuestion("", qa);
+  }
+
   $effect(() => {
     const quickInputListener = (e: KeyboardEvent) => {
       if (e.key === "k" && e.metaKey) {
@@ -89,7 +88,7 @@
     </button>
   </div>
   <div class="mt-28">
-    <ChatContainer resendMessage={handleResendMessage} />
+    <ChatContainer resendMessage={handleResendMessage} onFollowUp={handleFollowUp} />
   </div>
 </div>
 
