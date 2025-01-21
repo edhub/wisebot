@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+pre, code {
+    white-space: pre-wrap; /* Preserve spacing but wrap lines */
+    word-wrap: break-word; /* Break long words if needed */
+    overflow-wrap: break-word; /* Modern alternative to word-wrap */
+    max-width: 100%; /* Ensure it doesn't overflow its container */
+  }

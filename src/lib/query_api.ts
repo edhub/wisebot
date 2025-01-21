@@ -1,6 +1,113 @@
 import type { QandA } from './ChatStore';
 import { getModelConfig, getServerConfig, getApiKey } from './model_config';
 
+interface Message {
+  role: string;
+  content: string;
+}
+
+function prepareMessages(message: string, lastQA?: QandA): Message[] {
+  return lastQA ? [
+    { role: "user", content: lastQA.question },
+    { role: "assistant", content: lastQA.answer },
+    { role: "user", content: message },
+  ] : [
+    { role: "user", content: message },
+  ];
+}
+
+async function makeApiRequest(url: string, apiKey: string, body: string) {
+  const resp = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body,
+  });
+  return resp;
+}
+
+async function* handleStreamResponse(reader: ReadableStreamDefaultReader<Uint8Array>) {
+  const decoder = new TextDecoder();
+  let tailing = "";
+  let lastReasoningContent = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    let textDelta = tailing + decoder.decode(value);
+    let splits = textDelta
+      .split("\n")
+      .flatMap((s) => s.split("data: "))
+      .filter(Boolean);
+
+    const badEnd = !(textDelta.endsWith("]}") || textDelta.endsWith("[DONE]"));
+    tailing = badEnd ? splits.splice(splits.length - 1, 1)[0] : "";
+
+    try {
+      for (const s of splits) {
+        if (s.endsWith("[DONE]")) {
+          continue;
+        }
+
+        const jsonDelta = JSON.parse(s).choices[0].delta;
+
+        if (jsonDelta.reasoning_content) {
+          if (lastReasoningContent.length === 0) {
+            yield '```text\nThinking...\n----\n';
+          }
+          yield jsonDelta.reasoning_content;
+          lastReasoningContent = jsonDelta.reasoning_content;
+        }
+
+        if (jsonDelta.content) {
+          if (lastReasoningContent.length > 0) {
+            yield '\n```\n';
+            lastReasoningContent = '';
+          }
+          yield jsonDelta.content;
+        }
+      }
+    } catch (e) {
+      console.error("Error parsing stream response:", e);
+      console.log("Raw response:", textDelta);
+    }
+  }
+}
+
+async function* handleNonStreamResponse(reader: ReadableStreamDefaultReader<Uint8Array>) {
+  const decoder = new TextDecoder();
+  let text = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    text += decoder.decode(value);
+  }
+
+  try {
+    yield JSON.parse(text).choices[0].message.content;
+  } catch (e) {
+    console.error("Error parsing non-stream response:", e);
+    console.log("Raw response:", text);
+  }
+}
+
+function validateApiKey(apiKey: string | null, serverType: string): string | null {
+  if (!apiKey) {
+    if (serverType === 'deepseek') {
+      return "请设置 API key。\n请在 https://platform.deepseek.com/ 购买 API 调用，然后设置 API key";
+    }
+    if (serverType === 'bianxie') {
+      return "请设置 API key。\n请在 https://api.bianxie.ai 购买 API 调用，然后设置 API key";
+    }
+    return "请设置 API key。\n";
+  }
+  return null;
+}
+
 export async function* query(
   model: string,
   message: string,
@@ -11,44 +118,23 @@ export async function* query(
   const serverConfig = getServerConfig(modelConfig.serverType);
   const apiKey = getApiKey(modelConfig.serverType);
 
-  if (!apiKey) {
-    yield "请设置 API key。\n";
-    if (modelConfig.serverType === 'deepseek') {
-      yield "请在 https://platform.deepseek.com/ 购买 API 调用，然后设置 API key";
-    }
-    if (modelConfig.serverType === 'bianxie') {
-      yield "请在 https://api.bianxie.ai 购买 API 调用，然后设置 API key";
-    }
+  const errorMessage = validateApiKey(apiKey, modelConfig.serverType);
+  if (errorMessage) {
+    yield errorMessage;
     return;
   }
 
-  const stream = modelConfig.requiresStream;
-
-  const messages = lastQA ? [
-    { role: "user", content: lastQA.question },
-    { role: "assistant", content: lastQA.answer },
-    { role: "user", content: message },
-  ] : [
-    { role: "user", content: message },
-  ];
-
+  const messages = prepareMessages(message, lastQA);
   const body = JSON.stringify({
     model: model,
     messages,
     temperature: temperature,
-    stream,
+    stream: modelConfig.requiresStream,
   });
 
   let resp;
   try {
-    resp = await fetch(serverConfig.baseUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body,
-    });
+    resp = await makeApiRequest(serverConfig.baseUrl, apiKey!, body);
   } catch (e: any) {
     yield `出错啦: ${e.message}`;
     return;
@@ -60,56 +146,10 @@ export async function* query(
     return;
   }
 
-  const decoder = new TextDecoder();
-
-  if (stream) {
-    let tailing = "";
-    while (true) {
-      const { done, value } = await reader.read();
-
-      if (done) {
-        break;
-      }
-
-      let textDelta = tailing + decoder.decode(value);
-      let splits = textDelta
-        .split("\n")
-        .flatMap((s) => s.split("data: "))
-        .filter(Boolean);
-
-      const badEnd = !(textDelta.endsWith("]}") || textDelta.endsWith("[DONE]"));
-      tailing = badEnd ? splits.splice(splits.length - 1, 1)[0] : "";
-      
-      try {
-        let delta = splits
-          .map((s) => {
-            return s.endsWith("[DONE]")
-              ? ""
-              : JSON.parse(s).choices[0].delta.content;
-          })
-          .join("");
-        yield delta;
-      } catch (e) {
-        console.error("Error parsing stream response:", e);
-        console.log("Raw response:", textDelta);
-      }
-    }
+  if (modelConfig.requiresStream) {
+    yield* handleStreamResponse(reader);
   } else {
-    let text = "";
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) {
-        break;
-      }
-      text += decoder.decode(value);
-    }
-
-    try {
-      yield JSON.parse(text).choices[0].message.content;
-    } catch (e) {
-      console.error("Error parsing non-stream response:", e);
-      console.log("Raw response:", text);
-    }
+    yield* handleNonStreamResponse(reader);
   }
 }
 

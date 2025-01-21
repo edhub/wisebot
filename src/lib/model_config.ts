@@ -28,6 +28,12 @@ export const MODELS: Record<string, ModelConfig> = {
     requiresStream: true,
     defaultTemperature: 0.7,
   },
+  'deepseek-reasoner': {
+    displayName: 'DeepSeek Reasoner',
+    serverType: 'deepseek',
+    requiresStream: true,
+    defaultTemperature: 0.7,
+  },
   'o1-mini': {
     displayName: 'O1 Mini',
     serverType: 'bianxie',
