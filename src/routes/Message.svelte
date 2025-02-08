@@ -3,7 +3,7 @@
   import hljs from "highlight.js";
   import markedKatex from "marked-katex-extension";
   import "highlight.js/styles/github-dark-dimmed.min.css";
-  import type { QandA } from "./ChatStore";
+  import type { QandA } from "./ChatStore.svelte";
 
   import { fade } from "svelte/transition";
   import { getContext } from "svelte";

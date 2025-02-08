@@ -1,19 +1,28 @@
 <script lang="ts">
   import { tick } from "svelte";
-  import { query } from "$lib/query_api";
-  import ChatContainer from "$lib/ChatContainer.svelte";
-  import ChatInput from "$lib/ChatInput.svelte";
-  import Menu from "$lib/Menu.svelte";
-  import { chatLog, isRespOngoing, tempQA, generateId, type QandA } from "$lib/ChatStore";
-  import { MODELS } from "$lib/model_config";
+  import { query } from "./query_api";
+  import ChatContainer from "./ChatContainer.svelte";
+  import ChatInput from "./ChatInput.svelte";
+  import Menu from "./Menu.svelte";
+  import {
+    addQA,
+    chatState,
+    generateId,
+    type QandA,
+  } from "./ChatStore.svelte";
+  import { MODELS } from "./model_config";
 
   let showMenu = $state(false);
   let chatInput: ChatInput;
 
-  async function handleSendMessage(model: string, message: string, lastQA?: QandA) {
+  async function handleSendMessage(
+    model: string,
+    message: string,
+    lastQA?: QandA,
+  ) {
     if (message.trim() === "") return;
 
-    $tempQA = {
+    chatState.tempQA = {
       id: generateId(),
       question: message,
       answer: "",
@@ -21,7 +30,7 @@
     } as QandA;
 
     const startTime = Date.now();
-    $isRespOngoing = true;
+    chatState.isRespOngoing = true;
 
     await tick();
     window.scrollTo({
@@ -35,25 +44,26 @@
 
     for await (const delta of deltaReader) {
       if (isFirstResponse) {
-        $tempQA.firstResponseTime = Date.now() - startTime;
+        chatState.tempQA.firstResponseTime = Date.now() - startTime;
         isFirstResponse = false;
       }
       deltaCount++;
-      $tempQA.answer += delta;
+      chatState.tempQA.answer += delta;
     }
 
-    $tempQA.completionTime = Date.now() - startTime;
-
-    if ($tempQA.answer.length === 0) {
-      $tempQA.answer = "好像出错啦";
+    if (chatState.tempQA.answer.length === 0) {
+      chatState.tempQA.firstResponseTime = Date.now() - startTime;
+      chatState.tempQA.answer = "好像出错啦";
     }
 
-    $chatLog = [$tempQA, ...$chatLog];
-    $isRespOngoing = false;
+    chatState.tempQA.completionTime = Date.now() - startTime;
+
+    addQA(chatState.tempQA);
+    chatState.isRespOngoing = false;
   }
 
   function clearNonFavoriteChats() {
-    $chatLog = $chatLog.filter((qa) => qa.favorite);
+    chatState.chatLog = chatState.chatLog.filter((qa) => qa.favorite);
   }
 
   function handleResendMessage(message: string) {
@@ -77,8 +87,12 @@
 </script>
 
 <div class="z-0 w-full h-full">
-  <div class="fixed top-0 right-0 left-0 bg-gray-50 z-40 border-b pt-2">
-    <ChatInput bind:this={chatInput} onSendMessage={handleSendMessage} isRespOngoing={$isRespOngoing} />
+  <div class="fixed top-0 right-0 left-0 bg-gray-50 z-40 border-b pt-4">
+    <ChatInput
+      bind:this={chatInput}
+      onSendMessage={handleSendMessage}
+      isRespOngoing={chatState.isRespOngoing}
+    />
     <!-- 菜单按钮 -->
     <button
       class="absolute right-0 bottom-0 m-2 p-2 rounded bg-gray-200 hover:bg-blue-300 text-gray-600"
@@ -88,7 +102,10 @@
     </button>
   </div>
   <div class="mt-28">
-    <ChatContainer resendMessage={handleResendMessage} onFollowUp={handleFollowUp} />
+    <ChatContainer
+      resendMessage={handleResendMessage}
+      onFollowUp={handleFollowUp}
+    />
   </div>
 </div>
 

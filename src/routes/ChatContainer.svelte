@@ -3,14 +3,12 @@
   import Message from "./Message.svelte";
   import MessageFolded from "./MessageFolded.svelte";
   import {
-    chatLog,
-    isRespOngoing,
-    tempQA,
+    chatState,
     deleteQA,
     toggleFavorite,
     toggleFold,
     type QandA,
-  } from "./ChatStore";
+  } from "./ChatStore.svelte";
 
   let { resendMessage, onFollowUp} = $props<{
     resendMessage: (msg: string) => void;
@@ -30,9 +28,9 @@
 </svelte:head>
 
 <div bind:this={chatContainer} class="flex flex-col overflow-y-auto pb-32">
-  {#if $isRespOngoing}
+  {#if chatState.isRespOngoing}
     <Message
-      qandA={$tempQA}
+      qandA={chatState.tempQA}
       isRespOngoing={true}
       onResendMessage={resendMessage}
       {deleteQA}
@@ -40,7 +38,7 @@
       {toggleFold}
     />
   {/if}
-  {#each $chatLog as qa (qa.id)}
+  {#each chatState.chatLog as qa (qa.id)}
     {#if qa.folded}
       <MessageFolded
         qandA={qa}

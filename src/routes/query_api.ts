@@ -1,4 +1,4 @@
-import type { QandA } from './ChatStore';
+import type { QandA } from './ChatStore.svelte';
 import { getModelConfig, getServerConfig, getApiKey } from './model_config';
 
 interface Message {

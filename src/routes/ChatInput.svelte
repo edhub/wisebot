@@ -1,7 +1,7 @@
 <script lang="ts">
   import { tick } from "svelte";
   import { MODELS } from "./model_config";
-  import type { QandA } from "./ChatStore";
+  import type { QandA } from "./ChatStore.svelte";
   const KEY_LAST_MODEL = "last_used_model";
 
   let { onSendMessage, isRespOngoing } = $props<{

@@ -34,10 +34,10 @@ export const MODELS: Record<string, ModelConfig> = {
     requiresStream: true,
     defaultTemperature: 0.7,
   },
-  'o1-mini': {
-    displayName: 'O1 Mini',
+  'o3-mini': {
+    displayName: 'O3 Mini',
     serverType: 'bianxie',
-    requiresStream: false,
+    requiresStream: true,
     defaultTemperature: 0.7,
   },
   'claude-3-5-sonnet-20241022': {

@@ -1,8 +1,8 @@
 <script lang="ts">
   import { fade, slide } from "svelte/transition";
-  import BianXieApiConfig from "./BianXieApiConfig.svelte";
-  import { chatLog } from "./ChatStore";
-  import type { QandA } from "./ChatStore";
+  import BianXieApiConfig from "./ApiConfig.svelte";
+  import { chatState } from "./ChatStore.svelte";
+  import type { QandA } from "./ChatStore.svelte";
 
   let {
     showMenu = $bindable(false),
@@ -55,9 +55,7 @@
         <button
           class="w-full p-2 bg-gray-100 text-gray-600 rounded hover:bg-gray-200"
           onclick={() => {
-            chatLog.update((log: QandA[]) =>
-              log.map((qa) => ({ ...qa, folded: true })),
-            );
+            chatState.chatLog = chatState.chatLog.map((qa) => ({ ...qa, folded: true }));
             showMenu = false;
           }}>折叠全部消息</button
         >
