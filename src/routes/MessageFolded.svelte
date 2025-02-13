@@ -31,11 +31,16 @@
 >
   <div class="px-4 pt-2 pb-1">
     <p class="text-sm">
-      <span class="text-nowrap inline-block w-2/3 overflow-hidden text-ellipsis whitespace-nowrap text-gray-800">
+      <span
+        class="text-nowrap inline-block w-2/3 overflow-hidden text-ellipsis whitespace-nowrap text-gray-800"
+      >
         {qandA.question}
+        <span class="ml-4 text-xs text-gray-400">
+          {qandA.botName}
+        </span>
       </span>
 
-      <span >
+      <span>
         {#if showActionButtons || qandA.favorite}
           <button
             class="p-0 text-lg text-blue-400 float-right"

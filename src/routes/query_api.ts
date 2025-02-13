@@ -56,15 +56,15 @@ async function* handleStreamResponse(reader: ReadableStreamDefaultReader<Uint8Ar
 
         if (jsonDelta.reasoning_content) {
           if (lastReasoningContent.length === 0) {
-            yield '```text\nThinking...\n----\n';
+            yield '> 思考中...\n>\n> ';
           }
-          yield jsonDelta.reasoning_content;
+          yield jsonDelta.reasoning_content.replace(/\n/g, '\n> ');
           lastReasoningContent = jsonDelta.reasoning_content;
         }
 
         if (jsonDelta.content) {
           if (lastReasoningContent.length > 0) {
-            yield '\n```\n';
+            yield '\n\n';
             lastReasoningContent = '';
           }
           yield jsonDelta.content;

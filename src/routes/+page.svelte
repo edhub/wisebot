@@ -19,14 +19,15 @@
 
     const startTime = Date.now();
 
-    chatState.tempQA.unshift({
+    chatState.chatLog.unshift({
       id: generateId(),
       question: message,
       answer: "",
       botName: MODELS[model].displayName,
+      isResponseOngoing: true,
     });
 
-    const qa = chatState.tempQA[0];
+    const qa = chatState.chatLog[0];
 
     await tick();
     window.scrollTo({
@@ -51,15 +52,14 @@
     }
 
     qa.completionTime = Date.now() - startTime;
-
-    chatState.tempQA.pop();
-
-    chatState.chatLog.unshift(qa);
+    qa.isResponseOngoing = false;
+    
     saveChatLog();
   }
 
   function clearNonFavoriteChats() {
     chatState.chatLog = chatState.chatLog.filter((qa) => qa.favorite);
+    saveChatLog();
   }
 
   function handleResendMessage(message: string) {

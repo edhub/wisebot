@@ -10,7 +10,6 @@
 
   let {
     qandA,
-    isRespOngoing = false,
     onResendMessage = () => {},
     toggleFavorite,
     toggleFold,
@@ -18,13 +17,14 @@
     onFollowUp,
   }: {
     qandA: QandA;
-    isRespOngoing?: boolean;
     onResendMessage?: (message: string) => void;
     deleteQA: (qa: QandA) => void;
     toggleFavorite: (qa: QandA) => void;
     toggleFold: (qa: QandA) => void;
     onFollowUp?: (qa: QandA) => void;
   } = $props();
+
+  let isRespOngoing = $derived(qandA.isResponseOngoing ?? false);
 
   function highlight(code: string, lang: string) {
     if (hljs.getLanguage(lang)) {
@@ -33,8 +33,6 @@
       return hljs.highlightAuto(code).value;
     }
   }
-
-  $inspect(qandA);
 
   const renderer = {
     code(_code: string, infostring: any, escaped: any): string {

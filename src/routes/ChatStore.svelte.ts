@@ -8,6 +8,7 @@ export interface QandA {
   folded?: boolean;
   firstResponseTime?: number;  // 第一个字符返回的时间
   completionTime?: number;    // 请求完成的时间
+  isResponseOngoing?: boolean;
 }
 
 export const KEY_CHAT_LOG = "chatLog2";
@@ -18,7 +19,6 @@ const initialChatLog = storedChatLog ? JSON.parse(storedChatLog) : [];
 
 
 export const chatState = $state({
-  tempQA: [] as QandA[],
   chatLog: initialChatLog as QandA[],
 });
 
