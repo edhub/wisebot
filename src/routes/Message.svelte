@@ -34,6 +34,8 @@
     }
   }
 
+  $inspect(qandA);
+
   const renderer = {
     code(_code: string, infostring: any, escaped: any): string {
       const lang = (infostring || "").match(/\S*/)[0];
@@ -136,7 +138,7 @@
       `**问题：** ${qandA.question}\n来自 **${qandA.botName}** 的回答：\n\n---\n${qandA.answer}`,
     );
 
-    window.location.href = `bear://x-callback-url/create?&tags=${tags}&title=${title}&text=${text}`;
+    window.open(`bear://x-callback-url/create?&tags=${tags}&title=${title}&text=${text}`);
   }
 
   function formatTime(ms: number): string {

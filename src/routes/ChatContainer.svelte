@@ -28,15 +28,17 @@
 </svelte:head>
 
 <div bind:this={chatContainer} class="flex flex-col overflow-y-auto pb-32">
-  {#if chatState.isRespOngoing}
-    <Message
-      qandA={chatState.tempQA}
-      isRespOngoing={true}
-      onResendMessage={resendMessage}
-      {deleteQA}
-      {toggleFavorite}
-      {toggleFold}
-    />
+  {#if chatState.tempQA.length > 0}
+    {#each chatState.tempQA as qa (qa.id)}
+      <Message
+        qandA={qa}
+        isRespOngoing={true}
+        onResendMessage={resendMessage}
+        {deleteQA}
+        {toggleFavorite}
+        {toggleFold}
+      />
+    {/each}
   {/if}
   {#each chatState.chatLog as qa (qa.id)}
     {#if qa.folded}

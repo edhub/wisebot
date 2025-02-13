@@ -4,12 +4,7 @@
   import ChatContainer from "./ChatContainer.svelte";
   import ChatInput from "./ChatInput.svelte";
   import Menu from "./Menu.svelte";
-  import {
-    addQA,
-    chatState,
-    generateId,
-    type QandA,
-  } from "./ChatStore.svelte";
+  import { chatState, generateId, saveChatLog, type QandA} from "./ChatStore.svelte";
   import { MODELS } from "./model_config";
 
   let showMenu = $state(false);
@@ -22,15 +17,16 @@
   ) {
     if (message.trim() === "") return;
 
-    chatState.tempQA = {
+    const startTime = Date.now();
+
+    chatState.tempQA.unshift({
       id: generateId(),
       question: message,
       answer: "",
       botName: MODELS[model].displayName,
-    } as QandA;
+    });
 
-    const startTime = Date.now();
-    chatState.isRespOngoing = true;
+    const qa = chatState.tempQA[0];
 
     await tick();
     window.scrollTo({
@@ -39,27 +35,27 @@
     });
 
     const deltaReader = query(model, message, lastQA);
-    let deltaCount = 0;
     let isFirstResponse = true;
 
     for await (const delta of deltaReader) {
       if (isFirstResponse) {
-        chatState.tempQA.firstResponseTime = Date.now() - startTime;
+        qa.firstResponseTime = Date.now() - startTime;
         isFirstResponse = false;
       }
-      deltaCount++;
-      chatState.tempQA.answer += delta;
+      qa.answer += delta;
     }
 
-    if (chatState.tempQA.answer.length === 0) {
-      chatState.tempQA.firstResponseTime = Date.now() - startTime;
-      chatState.tempQA.answer = "好像出错啦";
+    if (qa.answer.length === 0) {
+      qa.firstResponseTime = Date.now() - startTime;
+      qa.answer = "好像出错啦";
     }
 
-    chatState.tempQA.completionTime = Date.now() - startTime;
+    qa.completionTime = Date.now() - startTime;
 
-    addQA(chatState.tempQA);
-    chatState.isRespOngoing = false;
+    chatState.tempQA.pop();
+
+    chatState.chatLog.unshift(qa);
+    saveChatLog();
   }
 
   function clearNonFavoriteChats() {
@@ -91,7 +87,6 @@
     <ChatInput
       bind:this={chatInput}
       onSendMessage={handleSendMessage}
-      isRespOngoing={chatState.isRespOngoing}
     />
     <!-- 菜单按钮 -->
     <button

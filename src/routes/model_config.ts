@@ -23,13 +23,13 @@ export interface ModelConfig {
 
 export const MODELS: Record<string, ModelConfig> = {
   'deepseek-chat': {
-    displayName: 'DeepSeekV3',
-    serverType: 'deepseek',
+    displayName: 'DeepSeekV3 bx',
+    serverType: 'bianxie',
     requiresStream: true,
     defaultTemperature: 0.7,
   },
   'deepseek-reasoner': {
-    displayName: 'DeepSeek Reasoner',
+    displayName: 'DeepSeek Reasoner ds',
     serverType: 'deepseek',
     requiresStream: true,
     defaultTemperature: 0.7,

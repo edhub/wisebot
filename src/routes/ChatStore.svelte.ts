@@ -16,19 +16,14 @@ export const KEY_CHAT_LOG = "chatLog2";
 const storedChatLog = localStorage.getItem(KEY_CHAT_LOG);
 const initialChatLog = storedChatLog ? JSON.parse(storedChatLog) : [];
 
+
 export const chatState = $state({
+  tempQA: [] as QandA[],
   chatLog: initialChatLog as QandA[],
-  isRespOngoing: false,
-  tempQA: { id: "", question: "", answer: "" } as QandA
 });
 
-function saveChatLog() {    
+export function saveChatLog() {    
   localStorage.setItem(KEY_CHAT_LOG, JSON.stringify(chatState.chatLog));
-}
-
-export function addQA(qa: QandA) {
-  chatState.chatLog = [qa, ...chatState.chatLog];
-  saveChatLog();
 }
 
 // 聊天操作函数

@@ -4,9 +4,8 @@
   import type { QandA } from "./ChatStore.svelte";
   const KEY_LAST_MODEL = "last_used_model";
 
-  let { onSendMessage, isRespOngoing } = $props<{
+  let { onSendMessage} = $props<{
     onSendMessage: (model: string, message: string, lastQA?: QandA) => void;
-    isRespOngoing: boolean;
   }>();
 
   let question = $state("");
@@ -43,10 +42,7 @@
   }
 
   function handleKeyDown(e: KeyboardEvent) {
-    if (isRespOngoing) {
-      return;
-    }
-
+    // 处理 Enter 发送消息
     // 处理 Enter 发送消息
     if (e.key === "Enter" && e.keyCode === 13 && !e.altKey && !e.shiftKey) {
       e.preventDefault();
