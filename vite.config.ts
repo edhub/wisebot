@@ -5,10 +5,10 @@ export default defineConfig({
   plugins: [sveltekit()],
   server: {
     proxy: {
-      '/api/deepseek': {
-        target: 'https://api.deepseek.com/chat/completions',
+      '/api/aliyun': {
+        target: 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
         changeOrigin: true,
-        rewrite: path => path.replace(/^\/api\/deepseek/, '')
+        rewrite: path => path.replace(/^\/api\/aliyun/, '')
       }
     },
   }

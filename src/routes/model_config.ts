@@ -4,13 +4,13 @@ export interface ServerConfig {
 }
 
 export const SERVERS: Record<string, ServerConfig> = {
-  'deepseek': {
-    baseUrl: '/api/deepseek',
-    apiKeyStorageKey: 'key_deepseek_api_key',
-  },
   'bianxie': {
     baseUrl: 'https://api.bianxie.ai/v1/chat/completions',
     apiKeyStorageKey: 'key_bian_xie_api_key',
+  },
+  'aliyun': {
+    baseUrl: '/api/aliyun',
+    apiKeyStorageKey: 'key_aliyun_api_key',
   },
 };
 
@@ -22,15 +22,15 @@ export interface ModelConfig {
 }
 
 export const MODELS: Record<string, ModelConfig> = {
-  'deepseek-chat': {
-    displayName: 'DeepSeekV3 bx',
-    serverType: 'bianxie',
+  'deepseek-v3': {
+    displayName: 'DeepSeek V3',
+    serverType: 'aliyun',
     requiresStream: true,
     defaultTemperature: 0.7,
   },
-  'deepseek-reasoner': {
-    displayName: 'DeepSeek Reasoner ds',
-    serverType: 'deepseek',
+  'deepseek-r1': {
+    displayName: 'DeepSeek R1',
+    serverType: 'aliyun',
     requiresStream: true,
     defaultTemperature: 0.7,
   },
@@ -46,15 +46,15 @@ export const MODELS: Record<string, ModelConfig> = {
     requiresStream: true,
     defaultTemperature: 0.7,
   },
-  'gpt-4o-all':{
+  'gpt-4o-all': {
     displayName: 'GPT-4o-all',
     serverType: 'bianxie',
     requiresStream: true,
     defaultTemperature: 0.7,
-  }
+  },
 }
 
-export const DEFAULT_MODEL = 'deepseek-chat';
+export const DEFAULT_MODEL = 'deepseek-v3';
 
 export function getModelConfig(modelName: string): ModelConfig {
   return MODELS[modelName] || MODELS[DEFAULT_MODEL];

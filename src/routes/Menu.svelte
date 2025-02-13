@@ -1,6 +1,6 @@
 <script lang="ts">
   import { fade, slide } from "svelte/transition";
-  import BianXieApiConfig from "./ApiConfig.svelte";
+  import ApiConfig from "./ApiConfig.svelte";
   import { chatState, saveChatLog } from "./ChatStore.svelte";
   import type { QandA } from "./ChatStore.svelte";
 
@@ -29,7 +29,7 @@
       class="fixed top-0 right-0 h-full w-80 overflow-auto bg-white border-l border-gray-200"
     >
       <div class="w-80 p-4">
-        <BianXieApiConfig />
+        <ApiConfig />
       </div>
       <div class="p-4 w-80">
         <div class="flex flex-row items-baseline">
