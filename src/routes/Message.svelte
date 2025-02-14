@@ -63,7 +63,7 @@
   };
 
   // @ts-ignore
-  marked.use({ renderer });
+  marked.use({ renderer, gfm: true, breaks: true });
 
   marked.use(
     markedKatex({
@@ -136,7 +136,9 @@
       `**问题：** ${qandA.question}\n来自 **${qandA.botName}** 的回答：\n\n---\n${qandA.answer}`,
     );
 
-    window.open(`bear://x-callback-url/create?&tags=${tags}&title=${title}&text=${text}`);
+    window.open(
+      `bear://x-callback-url/create?&tags=${tags}&title=${title}&text=${text}`,
+    );
   }
 
   function formatTime(ms: number): string {
@@ -239,7 +241,7 @@
     <div class="h-6 flex-1 flex items-center justify-end space-x-3 pr-1">
       {#if showActionButtons}
         <button
-        class="mr-2"
+          class="mr-2"
           transition:fade={{ duration: 300 }}
           onclick={() => {
             deleteQA(qandA);
