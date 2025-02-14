@@ -52,7 +52,7 @@ async function* handleStreamResponse(reader: ReadableStreamDefaultReader<Uint8Ar
           continue;
         }
 
-        const jsonDelta = JSON.parse(s).choices[0].delta;
+        const jsonDelta = JSON.parse(s).choices[0]?.delta ?? {};
 
         if (jsonDelta.reasoning_content) {
           if (lastReasoningContent.length === 0) {

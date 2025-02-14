@@ -1,8 +1,8 @@
 /// <reference types="@sveltejs/kit" />
 import { build, files, version } from "$service-worker";
 
-// Create a unique cache name for this deployment
-const CACHE = `cache-${version}`;
+// 创建一个唯一的缓存名称，使用时间戳确保每次部署都是唯一的
+const CACHE = `cache-${version}-${Date.now()}`;
 
 const ASSETS = [
   ...build, // the app itself
@@ -10,52 +10,69 @@ const ASSETS = [
 ];
 
 self.addEventListener("install", (event) => {
-  // Create a new cache and add all files to it
+  // 创建新缓存并添加所有文件
   async function addFilesToCache() {
     const cache = await caches.open(CACHE);
     await cache.addAll(ASSETS);
   }
 
   event.waitUntil(addFilesToCache());
+  // 立即激活新的 Service Worker
+  self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
-  // Remove previous cached data from disk
+  // 删除旧缓存
   async function deleteOldCaches() {
     for (const key of await caches.keys()) {
       if (key !== CACHE) await caches.delete(key);
     }
   }
 
-  event.waitUntil(deleteOldCaches());
+  event.waitUntil(
+    Promise.all([
+      deleteOldCaches(),
+      // 立即接管所有页面
+      self.clients.claim()
+    ])
+  );
 });
 
 self.addEventListener("fetch", (event) => {
-  // ignore POST requests etc
+  // 忽略非 GET 请求
   if (event.request.method !== "GET") return;
 
   async function respond() {
     const url = new URL(event.request.url);
     const cache = await caches.open(CACHE);
 
-    // `build`/`files` can always be served from the cache
+    // 检查是否是 API 请求
+    if (url.pathname.startsWith('/api/')) {
+      // API 请求始终走网络，不使用缓存
+      return fetch(event.request);
+    }
+
+    // 静态资源优先使用缓存
     if (ASSETS.includes(url.pathname)) {
       const response = await cache.match(url.pathname);
-
       if (response) {
+        // 在后台更新缓存
+        fetch(event.request)
+          .then(networkResponse => {
+            if (networkResponse.ok) {
+              cache.put(url.pathname, networkResponse);
+            }
+          })
+          .catch(() => {/* 忽略错误 */});
         return response;
       }
     }
 
-    // for everything else, try the network first, but
-    // fall back to the cache if we're offline
     try {
       const response = await fetch(event.request);
 
-      // if we're offline, fetch can return a value that is not a Response
-      // instead of throwing - and we can't pass this non-Response to respondWith
       if (!(response instanceof Response)) {
-        throw new Error("invalid response from fetch");
+        throw new Error("无效的响应");
       }
 
       if (response.status === 200) {
@@ -70,8 +87,6 @@ self.addEventListener("fetch", (event) => {
         return response;
       }
 
-      // if there's no cache, then just error out
-      // as there is nothing we can do to respond to this request
       throw err;
     }
   }
