@@ -294,14 +294,17 @@
       {/if}
     </div>
   </div>
-  <div class="pt-2 rounded-md border-gray-200 border">
-    <article class="prose px-4 max-w-none" onclick={handleUrlNavigation}>
-      {@html marked.parse(qandA.question)}
-    </article>
-
-    <div class="mt-4 pb-2 px-4">
-      <div class="flex text-xs items-center">
-        <span class="text-gray-500">
+  <div class="rounded-md border-gray-200 border overflow-hidden">
+    <div class="bg-gray-50">
+      <div class="h-2 bg-gray-300"></div>
+      <article
+        class="prose py-2 px-4 max-w-none text-gray-800"
+        onclick={handleUrlNavigation}
+      >
+        {@html marked.parse(qandA.question)}
+      </article>
+      <div class="flex text-xs px-4 items-center">
+        <span class="text-gray-800 font-bold">
           {qandA.botName}
         </span>
 
@@ -317,17 +320,20 @@
           </span>
         {/if}
       </div>
-      <hr class="w-1/3" />
-      <article class="prose mt-5 pb-2 max-w-none" onclick={handleUrlNavigation}>
-        {#if qandA.answer.length === 0 && isRespOngoing}
-          <div class="flex items-center gap-2">
-            <div class="blink">_</div>
-          </div>
-        {:else}
-          {@html marked.parse(qandA.answer)}
-        {/if}
-      </article>
     </div>
+    <hr class="ml-4 w-1/3 border-gray-300" />
+    <article
+      class="prose mt-5 pb-2 px-4 max-w-none"
+      onclick={handleUrlNavigation}
+    >
+      {#if qandA.answer.length === 0 && isRespOngoing}
+        <div class="flex items-center gap-2">
+          <div class="blink">_</div>
+        </div>
+      {:else}
+        {@html marked.parse(qandA.answer)}
+      {/if}
+    </article>
   </div>
 </div>
 
