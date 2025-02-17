@@ -22,9 +22,15 @@ export interface ModelConfig {
 }
 
 export const MODELS: Record<string, ModelConfig> = {
-  'deepseek-v3': {
-    displayName: 'DeepSeek V3',
-    serverType: 'aliyun',
+  'gemini-2.0-flash':{
+    displayName: 'Gemini 2.0',
+    serverType: 'bianxie',
+    requiresStream: true,
+    defaultTemperature: 0.7,
+  },
+  'o3-mini-medium': {
+    displayName: 'O3 Mini Medium',
+    serverType: 'bianxie',
     requiresStream: true,
     defaultTemperature: 0.7,
   },
@@ -34,8 +40,8 @@ export const MODELS: Record<string, ModelConfig> = {
     requiresStream: true,
     defaultTemperature: 0.7,
   },
-  'o3-mini': {
-    displayName: 'O3 Mini',
+  'gemini-2.0-flash-thinking-exp': {
+    displayName: 'Gemini 2.0 Thinking',
     serverType: 'bianxie',
     requiresStream: true,
     defaultTemperature: 0.7,
@@ -49,6 +55,12 @@ export const MODELS: Record<string, ModelConfig> = {
   'gpt-4o-all': {
     displayName: 'GPT-4o-all',
     serverType: 'bianxie',
+    requiresStream: true,
+    defaultTemperature: 0.7,
+  },
+  'deepseek-v3': {
+    displayName: 'DeepSeek V3',
+    serverType: 'aliyun',
     requiresStream: true,
     defaultTemperature: 0.7,
   },
