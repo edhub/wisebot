@@ -4,6 +4,10 @@ export interface ServerConfig {
 }
 
 export const SERVERS: Record<string, ServerConfig> = {
+  'deepseek': {
+    baseUrl: '/api/deepseek',
+    apiKeyStorageKey: 'key_deepseek_api_key',
+  },
   'bianxie': {
     baseUrl: 'https://api.bianxie.ai/v1/chat/completions',
     apiKeyStorageKey: 'key_bian_xie_api_key',
@@ -22,6 +26,12 @@ export interface ModelConfig {
 }
 
 export const MODELS: Record<string, ModelConfig> = {
+  'claude-3-7-sonnet-20250219':{
+    displayName: 'Claude 3.7',
+    serverType: 'bianxie',
+    requiresStream: true,
+    defaultTemperature: 0.7,
+  },
   'gemini-2.0-flash':{
     displayName: 'Gemini 2.0',
     serverType: 'bianxie',
@@ -34,36 +44,42 @@ export const MODELS: Record<string, ModelConfig> = {
     requiresStream: true,
     defaultTemperature: 0.7,
   },
-  'deepseek-r1': {
+  'deepseek-chat': {
+    displayName: 'DeepSeek Chat',
+    serverType: 'deepseek',
+    requiresStream: true,
+    defaultTemperature: 0.7,
+  },
+  'deepseek-reasoner': {
     displayName: 'DeepSeek R1',
-    serverType: 'aliyun',
+    serverType: 'deepseek',
     requiresStream: true,
     defaultTemperature: 0.7,
   },
-  'gemini-2.0-flash-thinking-exp': {
-    displayName: 'Gemini 2.0 Thinking',
-    serverType: 'bianxie',
-    requiresStream: true,
-    defaultTemperature: 0.7,
-  },
-  'claude-3-5-sonnet-20241022': {
-    displayName: 'Claude 3.5',
-    serverType: 'bianxie',
-    requiresStream: true,
-    defaultTemperature: 0.7,
-  },
+  // 'gemini-2.0-flash-thinking-exp': {
+  //   displayName: 'Gemini 2.0 Thinking',
+  //   serverType: 'bianxie',
+  //   requiresStream: true,
+  //   defaultTemperature: 0.7,
+  // },
+  // 'claude-3-5-sonnet-20241022': {
+  //   displayName: 'Claude 3.5',
+  //   serverType: 'bianxie',
+  //   requiresStream: true,
+  //   defaultTemperature: 0.7,
+  // },
   'gpt-4o-all': {
     displayName: 'GPT-4o-all',
     serverType: 'bianxie',
     requiresStream: true,
     defaultTemperature: 0.7,
   },
-  'deepseek-v3': {
-    displayName: 'DeepSeek V3',
-    serverType: 'aliyun',
-    requiresStream: true,
-    defaultTemperature: 0.7,
-  },
+  // 'deepseek-v3': {
+  //   displayName: 'DeepSeek V3',
+  //   serverType: 'aliyun',
+  //   requiresStream: true,
+  //   defaultTemperature: 0.7,
+  // },
 }
 
 export const DEFAULT_MODEL = 'deepseek-v3';

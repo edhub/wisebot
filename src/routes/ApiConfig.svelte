@@ -2,8 +2,13 @@
   import InplaceEdit from "./InplaceEdit.svelte";
   import { getApiKey, setApiKey } from "./model_config";
 
+  let deepseekApiKey = $state(getApiKey('deepseek'));
   let bianxieApiKey = $state(getApiKey("bianxie"));
   let aliyunApiKey = $state(getApiKey("aliyun"));
+
+  $effect(() => {
+    setApiKey("deepseek", deepseekApiKey);
+  });
 
   $effect(() => {
     setApiKey("bianxie", bianxieApiKey);
@@ -37,6 +42,16 @@
       class="rounded bg-gray-200 p-2 overflow-clip"
     >
       <InplaceEdit bind:value={aliyunApiKey} />
+    </div>
+  </div>
+    
+  <div>
+    <p class="mt-2 mb-1">DeepSeek API Key</p>
+    <div
+      onclick={(e) => e.stopPropagation()}
+      class="rounded bg-gray-200 p-2 overflow-clip"
+    >
+      <InplaceEdit bind:value={deepseekApiKey} />
     </div>
   </div>
 

@@ -41,7 +41,7 @@ async function* handleStreamResponse(reader: ReadableStreamDefaultReader<Uint8Ar
     let splits = textDelta
       .split("\n")
       .flatMap((s) => s.split("data: "))
-      .filter(Boolean);
+      .filter((s) => s.startsWith("{"));
 
     const badEnd = !(textDelta.endsWith("]}") || textDelta.endsWith("[DONE]"));
     tailing = badEnd ? splits.splice(splits.length - 1, 1)[0] : "";

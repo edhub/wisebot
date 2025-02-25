@@ -9,7 +9,12 @@ export default defineConfig({
         target: 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
         changeOrigin: true,
         rewrite: path => path.replace(/^\/api\/aliyun/, '')
-      }
+      },
+      '/api/deepseek': {
+        target: 'https://api.deepseek.com/chat/completions',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api\/deepseek/, '')
+      },
     },
   }
 });
