@@ -189,10 +189,10 @@
   role="article"
   class="mx-1 my-2"
   onmouseover={() => {
-    showActionButtons = !isRespOngoing;
+    showActionButtons = true;
   }}
   onfocus={() => {
-    showActionButtons = !isRespOngoing;
+    showActionButtons = true;
   }}
   onmouseleave={() => {
     showActionButtons = false;
@@ -201,15 +201,6 @@
   <div class="flex text-xs text-gray-400">
     <div class="h-6 flex-1 flex items-center space-x-3 pl-1">
       {#if showActionButtons}
-        <button
-          transition:fade={{ duration: 300 }}
-          onclick={() => {
-            onFollowUp?.(qandA);
-          }}
-        >
-          追问
-        </button>
-
         <button
           transition:fade={{ duration: 300 }}
           onclick={() => {
@@ -227,7 +218,9 @@
         >
           复制问题
         </button>
+      {/if}
 
+      {#if showActionButtons && !isRespOngoing}
         <button
           transition:fade={{ duration: 300 }}
           onclick={() => {
@@ -235,6 +228,15 @@
           }}
         >
           复制回复
+        </button>
+
+        <button
+          transition:fade={{ duration: 300 }}
+          onclick={() => {
+            onFollowUp?.(qandA);
+          }}
+        >
+          追问
         </button>
       {/if}
     </div>
@@ -249,7 +251,9 @@
         >
           删除
         </button>
+      {/if}
 
+      {#if showActionButtons && !isRespOngoing}
         <button
           transition:fade={{ duration: 300 }}
           onclick={() => {

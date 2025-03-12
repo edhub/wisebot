@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { tick } from "svelte";
   import Message from "./Message.svelte";
   import MessageFolded from "./MessageFolded.svelte";
   import {

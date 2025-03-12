@@ -2,7 +2,6 @@
   import { fade, slide } from "svelte/transition";
   import ApiConfig from "./ApiConfig.svelte";
   import { chatState, saveChatLog } from "./ChatStore.svelte";
-  import type { QandA } from "./ChatStore.svelte";
 
   let {
     showMenu = $bindable(false),
@@ -14,6 +13,8 @@
 </script>
 
 {#if showMenu}
+  <!-- svelte-ignore a11y_click_events_have_key_events -->
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
     onclick={async () => {
       showMenu = false;
@@ -55,7 +56,9 @@
         <button
           class="w-full p-2 bg-gray-100 text-gray-600 rounded hover:bg-gray-200"
           onclick={() => {
-            chatState.chatLog = chatState.chatLog.map((qa) => ({ ...qa, folded: true }));
+            chatState.chatLog.forEach((qa) => {
+              qa.folded = qa.isResponseOngoing ? false : true;
+            });
             saveChatLog();
             showMenu = false;
           }}>折叠全部消息</button
