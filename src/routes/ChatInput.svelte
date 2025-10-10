@@ -4,7 +4,7 @@
   import type { QandA } from "./ChatStore.svelte";
   const KEY_LAST_MODEL = "last_used_model";
 
-  let { onSendMessage} = $props<{
+  let { onSendMessage } = $props<{
     onSendMessage: (model: string, message: string, lastQA?: QandA) => void;
   }>();
 
@@ -42,7 +42,6 @@
   }
 
   function handleKeyDown(e: KeyboardEvent) {
-    // 处理 Enter 发送消息
     // 处理 Enter 发送消息
     if (e.key === "Enter" && e.keyCode === 13 && !e.altKey && !e.shiftKey) {
       e.preventDefault();
@@ -124,12 +123,12 @@
       bind:value={question}
       class="p-2 mt-2 resize-none w-full rounded border flex-grow"
       rows="1"
-      maxlength="6000"
+      maxlength="10000"
       onkeydown={handleKeyDown}
       oninput={resizeTextarea}
     ></textarea>
     <div
-      class="flex items-center gap-2 text-xs text-gray-500 w-4/5 overflow-scroll"
+      class="flex items-center gap-2 text-xs text-gray-500 w-4/5 hide-scrollbar"
     >
       {#each availableModels as model, i}
         <button
@@ -149,3 +148,11 @@
     </div>
   </div>
 </form>
+
+<style>
+  .hide-scrollbar {
+    overflow: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+</style>

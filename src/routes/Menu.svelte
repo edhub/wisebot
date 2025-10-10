@@ -32,26 +32,6 @@
       <div class="w-80 p-4">
         <ApiConfig />
       </div>
-      <div class="p-4 w-80">
-        <div class="flex flex-row items-baseline">
-          <p class="text-lg font-bold">说明</p>
-        </div>
-        <hr class="my-2" />
-        <ul class="list-disc list-inside mx-2">
-          <li>
-            <b>Gemini 2.0</b>  Google 最新的普通模型，速度很快，一般问答足够。
-          </li>
-          <li>
-            <b>o3 Mini Medium</b> O3 推理模型，速度很快，需要高质量的答案可以优先使用。
-          </li>
-          <li>
-            <b>DeepSeek R1</b> 国产模型，官方服务不够稳定，所以用的是阿里的服务，但速度比较慢。好处是可以看到思考过程。
-          </li>
-          <li>
-            <b>其他</b> 其他模型就不详细介绍了，可以自己尝试，我一般是按照自己的使用习惯来给模型排序，用的多的放前面。
-          </li>
-        </ul>
-      </div>
       <div class="w-80 p-4">
         <button
           class="w-full p-2 bg-gray-100 text-gray-600 rounded hover:bg-gray-200"
