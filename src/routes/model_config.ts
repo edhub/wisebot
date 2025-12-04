@@ -20,45 +20,52 @@ export const SERVERS: Record<string, ServerConfig> = {
 
 export interface ModelConfig {
   displayName: string;
+  fullName: string;
   serverType: keyof typeof SERVERS;
   requiresStream: boolean;
   defaultTemperature: number;
 }
 
 export const MODELS: Record<string, ModelConfig> = {
-  "grok-4-fast-non-reasoning": {
-    displayName: "Grok 4",
-    serverType: "bianxie",
-    requiresStream: true,
-    defaultTemperature: 0.7,
-  },
-  "gemini-2.5-flash-nothinking": {
-    displayName: "Gemini flash",
-    serverType: "bianxie",
-    requiresStream: true,
-    defaultTemperature: 0.7,
-  },
-  "gemini-2.5-pro": {
-    displayName: "Gemini Pro",
-    serverType: "bianxie",
-    requiresStream: true,
-    defaultTemperature: 0.7,
-  },
-  "deepseek-chat": {
-    displayName: "DeepSeek Chat",
+  "deepseek-chat": { // $0.28 - $0.42
+    displayName: "DS",
+    fullName: "Deepseek Chat",
     serverType: "deepseek",
     requiresStream: true,
     defaultTemperature: 0.7,
   },
-  "gpt-5-codex": {
-    displayName: "GPT5 Codex",
+  "deepseek-reasoner": { // $0.28 - $0.42
+    displayName: "DS-R",
+    fullName: "Deepseek Reasoner",
+    serverType: "deepseek",
+    requiresStream: true,
+    defaultTemperature: 0.7,
+  },
+  "gemini-3-pro-preview": { // $1.25 - $10
+    displayName: "Ge3 Pro",
+    fullName: "Gemini 3.0 Pro",
     serverType: "bianxie",
     requiresStream: true,
     defaultTemperature: 0.7,
   },
-  "deepseek-reasoner": {
-    displayName: "DeepSeek R1",
-    serverType: "deepseek",
+  "gemini-2.5-flash-nothinking": { // $0.3 - $2.5
+    displayName: "Ge2.5 Flash",
+    fullName: "Gemini 2.5 Flash",
+    serverType: "bianxie",
+    requiresStream: true,
+    defaultTemperature: 0.7,
+  },
+  "gpt-5.1": { // $1.25 - $10
+    displayName: "GPT5.1",
+    fullName: "GPT5.1",
+    serverType: "bianxie",
+    requiresStream: true,
+    defaultTemperature: 0.7,
+  },
+  "claude-opus-4-5-20251101": { // $1.0 - $1.0
+    displayName: "Claude Opus 4.5",
+    fullName: "Claude Opus 4.5",
+    serverType: "bianxie",
     requiresStream: true,
     defaultTemperature: 0.7,
   },

@@ -4,7 +4,12 @@
   import ChatContainer from "./ChatContainer.svelte";
   import ChatInput from "./ChatInput.svelte";
   import Menu from "./Menu.svelte";
-  import { chatState, generateId, saveChatLog, type QandA} from "./ChatStore.svelte";
+  import {
+    chatState,
+    generateId,
+    saveChatLog,
+    type QandA,
+  } from "./ChatStore.svelte";
   import { MODELS } from "./model_config";
 
   let showMenu = $state(false);
@@ -13,7 +18,7 @@
   async function handleSendMessage(
     model: string,
     message: string,
-    lastQA?: QandA,
+    lastQA?: QandA
   ) {
     if (message.trim() === "") return;
 
@@ -23,7 +28,7 @@
       id: generateId(),
       question: message,
       answer: "",
-      botName: MODELS[model].displayName,
+      botName: MODELS[model].fullName,
       isResponseOngoing: true,
     });
 
@@ -53,7 +58,7 @@
 
     qa.completionTime = Date.now() - startTime;
     qa.isResponseOngoing = false;
-    
+
     saveChatLog();
   }
 
@@ -84,16 +89,13 @@
 
 <div class="z-0 w-full h-full">
   <div class="fixed top-0 right-0 left-0 bg-gray-50 z-40 border-b pt-4">
-    <ChatInput
-      bind:this={chatInput}
-      onSendMessage={handleSendMessage}
-    />
+    <ChatInput bind:this={chatInput} onSendMessage={handleSendMessage} />
     <!-- 菜单按钮 -->
     <button
       class="absolute right-0 bottom-0 m-2 p-2 rounded bg-gray-200 hover:bg-blue-300 text-gray-600"
       on:click={() => (showMenu = true)}
     >
-      <span class="iconify simple-line-icons--menu text-sm"> </span>
+      <span class="iconify simple-line-icons--menu text-sm" />
     </button>
   </div>
   <div class="mt-28">
