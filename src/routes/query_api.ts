@@ -1,5 +1,5 @@
-import type { QandA } from './ChatStore.svelte';
-import { getModelConfig, getServerConfig, getApiKey } from './model_config';
+import type { QandA } from "./ChatStore.svelte";
+import { getModelConfig, getServerConfig, getApiKey } from "./model_config";
 
 interface Message {
   role: string;
@@ -7,13 +7,13 @@ interface Message {
 }
 
 function prepareMessages(message: string, lastQA?: QandA): Message[] {
-  return lastQA ? [
-    { role: "user", content: lastQA.question },
-    { role: "assistant", content: lastQA.answer },
-    { role: "user", content: message },
-  ] : [
-    { role: "user", content: message },
-  ];
+  return lastQA
+    ? [
+        { role: "user", content: lastQA.question },
+        { role: "assistant", content: lastQA.answer },
+        { role: "user", content: message },
+      ]
+    : [{ role: "user", content: message }];
 }
 
 async function makeApiRequest(url: string, apiKey: string, body: string) {
@@ -28,56 +28,54 @@ async function makeApiRequest(url: string, apiKey: string, body: string) {
   return resp;
 }
 
-async function* handleStreamResponse(reader: ReadableStreamDefaultReader<Uint8Array>) {
+async function* handleStreamResponse(
+  reader: ReadableStreamDefaultReader<Uint8Array>,
+) {
   const decoder = new TextDecoder();
-  let tailing = "";
+  let buffer = "";
   let lastReasoningContent = "";
 
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
 
-    let textDelta = tailing + decoder.decode(value);
-    let splits = textDelta
-      .split("\n")
-      .flatMap((s) => s.split("data: "))
-      .filter((s) => s.startsWith("{"));
+    buffer += decoder.decode(value, { stream: true });
+    let lines = buffer.split("\n");
+    buffer = lines.pop() || "";
 
-    const badEnd = !(textDelta.endsWith("]}") || textDelta.endsWith("[DONE]"));
-    tailing = badEnd ? splits.splice(splits.length - 1, 1)[0] : "";
+    for (const line of lines) {
+      const s = line.replace(/^data: /, "").trim();
+      if (!s || s === "[DONE]") continue;
 
-    try {
-      for (const s of splits) {
-        if (s.endsWith("[DONE]")) {
-          continue;
-        }
-
+      try {
         const jsonDelta = JSON.parse(s).choices[0]?.delta ?? {};
 
         if (jsonDelta.reasoning_content) {
           if (lastReasoningContent.length === 0) {
-            yield '> 思考中...\n>\n> ';
+            yield "> 思考中...\n>\n> ";
           }
-          yield jsonDelta.reasoning_content.replace(/\n/g, '\n> ');
+          yield jsonDelta.reasoning_content.replace(/\n/g, "\n> ");
           lastReasoningContent = jsonDelta.reasoning_content;
         }
 
         if (jsonDelta.content) {
           if (lastReasoningContent.length > 0) {
-            yield '\n\n';
-            lastReasoningContent = '';
+            yield "\n\n";
+            lastReasoningContent = "";
           }
           yield jsonDelta.content;
         }
+      } catch (e) {
+        console.error("Error parsing stream response:", e);
+        console.log("Raw line:", s);
       }
-    } catch (e) {
-      console.error("Error parsing stream response:", e);
-      console.log("Raw response:", textDelta);
     }
   }
 }
 
-async function* handleNonStreamResponse(reader: ReadableStreamDefaultReader<Uint8Array>) {
+async function* handleNonStreamResponse(
+  reader: ReadableStreamDefaultReader<Uint8Array>,
+) {
   const decoder = new TextDecoder();
   let text = "";
 
@@ -95,12 +93,15 @@ async function* handleNonStreamResponse(reader: ReadableStreamDefaultReader<Uint
   }
 }
 
-function validateApiKey(apiKey: string | null, serverType: string): string | null {
+function validateApiKey(
+  apiKey: string | null,
+  serverType: string,
+): string | null {
   if (!apiKey) {
-    if (serverType === 'deepseek') {
+    if (serverType === "deepseek") {
       return "请设置 API key。\n请在 https://platform.deepseek.com/ 购买 API 调用，然后设置 API key";
     }
-    if (serverType === 'bianxie') {
+    if (serverType === "bianxie") {
       return "请设置 API key。\n请在 https://api.bianxie.ai 购买 API 调用，然后设置 API key";
     }
     return "请设置 API key。\n";
@@ -152,4 +153,3 @@ export async function* query(
     yield* handleNonStreamResponse(reader);
   }
 }
-

@@ -4,15 +4,15 @@ export interface ServerConfig {
 }
 
 export const SERVERS: Record<string, ServerConfig> = {
-  "deepseek": {
+  deepseek: {
     baseUrl: "/api/deepseek",
     apiKeyStorageKey: "key_deepseek_api_key",
   },
-  "bianxie": {
+  bianxie: {
     baseUrl: "https://api.bianxie.ai/v1/chat/completions",
     apiKeyStorageKey: "key_bian_xie_api_key",
   },
-  "aliyun": {
+  aliyun: {
     baseUrl: "/api/aliyun",
     apiKeyStorageKey: "key_aliyun_api_key",
   },
@@ -27,42 +27,48 @@ export interface ModelConfig {
 }
 
 export const MODELS: Record<string, ModelConfig> = {
-  "deepseek-chat": { // $0.28 - $0.42
+  "deepseek-chat": {
+    // $0.28 - $0.42
     displayName: "DS",
     fullName: "Deepseek Chat",
     serverType: "deepseek",
     requiresStream: true,
     defaultTemperature: 0.7,
   },
-  "deepseek-reasoner": { // $0.28 - $0.42
-    displayName: "DS-R",
-    fullName: "Deepseek Reasoner",
-    serverType: "deepseek",
-    requiresStream: true,
-    defaultTemperature: 0.7,
-  },
-  "gemini-3-pro-preview": { // $1.25 - $10
+  "gemini-3-pro-preview": {
+    // $1.25 - $10
     displayName: "Ge3 Pro",
     fullName: "Gemini 3.0 Pro",
     serverType: "bianxie",
     requiresStream: true,
     defaultTemperature: 0.7,
   },
-  "gemini-2.5-flash-nothinking": { // $0.3 - $2.5
-    displayName: "Ge2.5 Flash",
-    fullName: "Gemini 2.5 Flash",
+  "gemini-3-flash-preview": {
+    // $0.3 - $2.5
+    displayName: "Ge3 Flash",
+    fullName: "Gemini 3.0 Flash",
     serverType: "bianxie",
     requiresStream: true,
     defaultTemperature: 0.7,
   },
-  "gpt-5.1": { // $1.25 - $10
+  "gpt-5.1": {
+    // $1.25 - $10
     displayName: "GPT5.1",
     fullName: "GPT5.1",
     serverType: "bianxie",
     requiresStream: true,
     defaultTemperature: 0.7,
   },
-  "claude-opus-4-5-20251101": { // $1.0 - $1.0
+  "deepseek-reasoner": {
+    // $0.28 - $0.42
+    displayName: "DS-R",
+    fullName: "Deepseek Reasoner",
+    serverType: "deepseek",
+    requiresStream: true,
+    defaultTemperature: 0.7,
+  },
+  "claude-opus-4-5-20251101": {
+    // $1.0 - $1.0
     displayName: "Claude Opus 4.5",
     fullName: "Claude Opus 4.5",
     serverType: "bianxie",
