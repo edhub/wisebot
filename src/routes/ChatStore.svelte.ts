@@ -54,6 +54,27 @@ function loadInitialMessages(): QandA[] {
 
 const initialMessages = loadInitialMessages();
 
+export const confirmState = $state({
+  show: false,
+  title: "",
+  message: "",
+  onConfirm: () => {},
+});
+
+export function openConfirm(
+  title: string,
+  message: string,
+  onConfirm: () => void,
+) {
+  confirmState.title = title;
+  confirmState.message = message;
+  confirmState.onConfirm = () => {
+    onConfirm();
+    confirmState.show = false;
+  };
+  confirmState.show = true;
+}
+
 // 使用 Svelte 5 Runes 管理全局状态
 export const chatState = $state({
   messages: initialMessages as QandA[],
@@ -164,8 +185,39 @@ export function toggleFoldAll(folded: boolean) {
 }
 
 export function clearAllMessages() {
-  if (confirm("确定要清空所有对话吗？")) {
+  openConfirm("清空所有", "确定要清空所有对话吗？", () => {
     chatState.messages = [];
     saveChatLog();
+  });
+}
+
+export function deleteGroup(roots: QandA[]) {
+  const rootIds = new Set(roots.map((r) => r.id));
+
+  // 找出属于这些根节点的所有消息 ID
+  const groupMessageIds = new Set<string>();
+  const stack = [...roots.map((r) => r.id)];
+  while (stack.length > 0) {
+    const id = stack.pop()!;
+    groupMessageIds.add(id);
+    chatState.messages
+      .filter((m) => m.parentId === id)
+      .forEach((m) => stack.push(m.id));
   }
+
+  // 找出该分组内所有未收藏的消息
+  // 调用 deleteQA 处理，它会自动处理子节点的提升逻辑
+  const toDelete = chatState.messages.filter(
+    (m) => groupMessageIds.has(m.id) && !m.favorite,
+  );
+
+  // 如果没有可删除的，直接返回
+  if (toDelete.length === 0) return;
+
+  toDelete.forEach((m) => {
+    const current = chatState.messages.find((item) => item.id === m.id);
+    if (current) {
+      deleteQA(current);
+    }
+  });
 }

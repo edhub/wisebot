@@ -202,23 +202,7 @@
                 再次发送
             </button>
 
-            <button
-                onclick={() => {
-                    copyToClipboard(qandA.question);
-                }}
-            >
-                复制问题
-            </button>
-
             {#if !isRespOngoing}
-                <button
-                    onclick={() => {
-                        copyToClipboard(qandA.answer);
-                    }}
-                >
-                    复制回复
-                </button>
-
                 <button
                     onclick={() => {
                         onFollowUp?.(qandA);

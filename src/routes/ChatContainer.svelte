@@ -47,7 +47,7 @@
             >
                 <span
                     class="iconify simple-line-icons--pencil text-2xl opacity-20"
-                />
+                ></span>
             </div>
             <p class="text-sm font-medium text-gray-400">
                 在此开启你的第一个问题

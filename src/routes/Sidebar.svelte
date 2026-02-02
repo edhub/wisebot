@@ -2,6 +2,8 @@
     import {
         chatState,
         toggleFavorite,
+        deleteGroup,
+        openConfirm,
         type QandA,
     } from "./ChatStore.svelte";
     import { slide } from "svelte/transition";
@@ -106,14 +108,29 @@
     </div>
 {/snippet}
 
-<div class="flex flex-col h-full bg-transparent w-full overflow-hidden select-none">
+<div class="flex flex-col h-full bg-white w-full overflow-hidden select-none">
     <!-- Message Tree List -->
     <div class="flex-1 overflow-y-auto px-3 py-4 space-y-6 scrollbar-thin">
         {#each groupedRoots as group}
-            <div transition:slide={{ duration: 200 }}>
-                <h3 class="px-2 mb-1.5 text-[10px] font-medium text-gray-400/50 uppercase tracking-[0.1em]">
-                    {group.label}
-                </h3>
+            <div transition:slide={{ duration: 200 }} class="group/section">
+                <div class="flex items-center justify-between px-2 mb-1.5">
+                    <h3 class="text-[10px] font-medium text-gray-400/50 uppercase tracking-[0.1em]">
+                        {group.label}
+                    </h3>
+                    <button
+                        class="p-1 rounded hover:bg-red-50 text-gray-300 hover:text-red-400 transition-colors opacity-40 md:opacity-0 md:group-hover/section:opacity-100 touch-manipulation"
+                        onclick={() => {
+                            openConfirm(
+                                "清除非收藏",
+                                `确定要清空“${group.label}”中所有未收藏的对话吗？`,
+                                () => deleteGroup(group.items)
+                            );
+                        }}
+                        title="清除非收藏对话"
+                    >
+                        <span class="iconify simple-line-icons--trash text-[10px]"></span>
+                    </button>
+                </div>
                 <div class="space-y-0.5">
                     {#each group.items as root (root.id)}
                         {@render MessageNode(root)}
@@ -129,7 +146,7 @@
     </div>
 
     <!-- Footer: User & Settings -->
-    <div class="p-4 border-t border-gray-100/20 bg-transparent backdrop-blur-[2px]">
+    <div class="p-4 border-t border-gray-100/20 bg-gray-50/50 backdrop-blur-[2px]">
         <div class="flex items-center justify-between px-1">
             <div class="flex items-center gap-3 min-w-0">
                 <div

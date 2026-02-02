@@ -109,6 +109,7 @@
     }
 </script>
 
+<!-- svelte-ignore a11y_consider_explicit_label -->
 <form class="flex flex-col">
     <div class="px-2 pb-2">
         {#if lastQA}

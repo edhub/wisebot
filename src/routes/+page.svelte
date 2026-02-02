@@ -11,9 +11,11 @@
         generateId,
         saveChatLog,
         addMessage,
+        openConfirm,
         type QandA,
     } from "./ChatStore.svelte";
     import { MODELS } from "./model_config";
+    import ConfirmDialog from "./ConfirmDialog.svelte";
 
     let showMenu = $state(false);
     let showSidebar = $state(false);
@@ -109,10 +111,10 @@
     }
 
     function clearNonFavoriteChats() {
-        if (confirm("确定要清除非收藏的所有对话吗？")) {
+        openConfirm("清除非收藏", "确定要清除非收藏的所有对话吗？", () => {
             chatState.messages = chatState.messages.filter((qa) => qa.favorite);
             saveChatLog();
-        }
+        });
     }
 
     function handleResendMessage(message: string) {
@@ -259,15 +261,15 @@
     });
 </script>
 
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
     class="flex h-screen w-full overflow-hidden bg-white text-gray-900 relative"
     onmouseup={handleMouseUp}
 >
     <!-- 左侧：问答历史列表 -->
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <!-- svelte-ignore a11y_no_static_element_interactions -->
     <aside
-        class="fixed inset-y-0 left-0 z-[70] w-3/4 max-w-[300px] bg-transparent border-r border-gray-100/50 transition-transform duration-300 md:relative md:translate-x-0 md:w-1/4 md:min-w-[280px] md:max-w-[380px]"
+        class="fixed inset-y-0 left-0 z-[70] w-3/4 max-w-[300px] bg-white shadow-2xl border-r border-gray-100/50 transition-transform duration-300 md:relative md:shadow-none md:translate-x-0 md:w-1/4 md:min-w-[280px] md:max-w-[380px]"
         class:-translate-x-full={!showSidebar}
     >
         <Sidebar
@@ -275,16 +277,6 @@
             {activeId}
             onSelect={() => (showSidebar = false)}
         />
-        <!-- Mobile close button -->
-        {#if showSidebar}
-            <button
-                class="md:hidden absolute top-4 right-[-40px] w-10 h-10 bg-white border border-l-0 border-gray-200 rounded-r-xl flex items-center justify-center text-gray-400 shadow-sm"
-                onclick={() => (showSidebar = false)}
-                transition:fade={{ duration: 200 }}
-            >
-                <span class="iconify simple-line-icons--arrow-left"></span>
-            </button>
-        {/if}
     </aside>
 
     <!-- Mobile Overlay -->
@@ -325,8 +317,6 @@
     <main class="flex-1 flex flex-col relative min-w-0 h-full bg-white">
         <!-- 展开时的输入框覆盖层 -->
         {#if !isScrolled}
-            <!-- svelte-ignore a11y_click_events_have_key_events -->
-            <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div
                 class="fixed inset-0 z-[80] flex items-start justify-center pt-12 md:pt-20 px-4 md:px-6 bg-gray-900/5 backdrop-blur-[2px]"
                 transition:fade={{ duration: 200 }}
@@ -409,6 +399,7 @@
 </div>
 
 <Menu bind:showMenu clearChat={clearNonFavoriteChats} />
+<ConfirmDialog />
 
 <style>
     :global(body) {
