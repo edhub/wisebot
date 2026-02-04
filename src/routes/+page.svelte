@@ -327,7 +327,7 @@
                     onclick={(e) => e.stopPropagation()}
                 >
                     <div
-                        class="bg-white border border-gray-200 rounded-2xl shadow-2xl shadow-gray-400/20 overflow-hidden focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-100"
+                        class="bg-white border border-gray-200 rounded-2xl shadow-2xl shadow-gray-400/20 overflow-hidden"
                     >
                         <ChatInput
                             bind:this={chatInput}

@@ -134,7 +134,7 @@
                 id="chat-input"
                 placeholder="⌘+k 输入消息..."
                 bind:value={question}
-                class="p-2 resize-none w-full rounded-xl border border-gray-200 flex-grow focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 transition-all touch-manipulation"
+                class="p-2 resize-none w-full rounded-xl border border-gray-200 flex-grow focus:outline-none transition-all touch-manipulation"
                 rows="1"
                 maxlength="10000"
                 onkeydown={handleKeyDown}

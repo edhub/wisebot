@@ -23,7 +23,7 @@
     } = $props();
 
     let isRespOngoing = $derived(qandA.isResponseOngoing ?? false);
-    let questionHtml = $derived(marked.parse(qandA.question));
+    let questionHtml = $derived(qandA.question);
     let answerHtml = $derived(marked.parse(qandA.answer));
 
     function highlight(code: string, lang: string) {
