@@ -35,41 +35,46 @@ async function* handleStreamResponse(
   let buffer = "";
   let lastReasoningContent = "";
 
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
 
-    buffer += decoder.decode(value, { stream: true });
-    let lines = buffer.split("\n");
-    buffer = lines.pop() || "";
+      buffer += decoder.decode(value, { stream: true });
+      let lines = buffer.split("\n");
+      buffer = lines.pop() || "";
 
-    for (const line of lines) {
-      const s = line.replace(/^data: /, "").trim();
-      if (!s || s === "[DONE]") continue;
+      for (const line of lines) {
+        const s = line.replace(/^data: /, "").trim();
+        if (!s || s === "[DONE]") continue;
 
-      try {
-        const jsonDelta = JSON.parse(s).choices[0]?.delta ?? {};
+        try {
+          const jsonDelta = JSON.parse(s).choices[0]?.delta ?? {};
 
-        if (jsonDelta.reasoning_content) {
-          if (lastReasoningContent.length === 0) {
-            yield "> 思考中...\n>\n> ";
+          if (jsonDelta.reasoning_content) {
+            if (lastReasoningContent.length === 0) {
+              yield "> 思考中...\n>\n> ";
+            }
+            yield jsonDelta.reasoning_content.replace(/\n/g, "\n> ");
+            lastReasoningContent = jsonDelta.reasoning_content;
           }
-          yield jsonDelta.reasoning_content.replace(/\n/g, "\n> ");
-          lastReasoningContent = jsonDelta.reasoning_content;
-        }
 
-        if (jsonDelta.content) {
-          if (lastReasoningContent.length > 0) {
-            yield "\n\n";
-            lastReasoningContent = "";
+          if (jsonDelta.content) {
+            if (lastReasoningContent.length > 0) {
+              yield "\n\n";
+              lastReasoningContent = "";
+            }
+            yield jsonDelta.content;
           }
-          yield jsonDelta.content;
+        } catch (e) {
+          console.error("Error parsing stream response:", e);
+          console.log("Raw line:", s);
         }
-      } catch (e) {
-        console.error("Error parsing stream response:", e);
-        console.log("Raw line:", s);
       }
     }
+  } finally {
+    reader.cancel().catch(() => {});
+    reader.releaseLock();
   }
 }
 
@@ -79,17 +84,22 @@ async function* handleNonStreamResponse(
   const decoder = new TextDecoder();
   let text = "";
 
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    text += decoder.decode(value);
-  }
-
   try {
-    yield JSON.parse(text).choices[0].message.content;
-  } catch (e) {
-    console.error("Error parsing non-stream response:", e);
-    console.log("Raw response:", text);
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      text += decoder.decode(value);
+    }
+
+    try {
+      yield JSON.parse(text).choices[0].message.content;
+    } catch (e) {
+      console.error("Error parsing non-stream response:", e);
+      console.log("Raw response:", text);
+    }
+  } finally {
+    reader.cancel().catch(() => {});
+    reader.releaseLock();
   }
 }
 

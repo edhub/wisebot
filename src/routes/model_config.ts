@@ -51,10 +51,18 @@ export const MODELS: Record<string, ModelConfig> = {
     requiresStream: true,
     defaultTemperature: 0.7,
   },
-  "gpt-5.1": {
+  "gemini-3-flash-preview-thinking": {
+    // $0.3 - $2.5
+    displayName: "Ge3 Flash T",
+    fullName: "Gemini 3.0 Flash Thinking",
+    serverType: "bianxie",
+    requiresStream: true,
+    defaultTemperature: 0.7,
+  },
+  "gpt-5.3-codex": {
     // $1.25 - $10
-    displayName: "GPT5.1",
-    fullName: "GPT5.1",
+    displayName: "GPT5.3-C",
+    fullName: "GPT5.3-codex",
     serverType: "bianxie",
     requiresStream: true,
     defaultTemperature: 0.7,
@@ -67,10 +75,10 @@ export const MODELS: Record<string, ModelConfig> = {
     requiresStream: true,
     defaultTemperature: 0.7,
   },
-  "claude-opus-4-5-20251101": {
+  "claude-opus-4-6": {
     // $1.0 - $1.0
-    displayName: "Claude Opus 4.5",
-    fullName: "Claude Opus 4.5",
+    displayName: "Opus 4.6",
+    fullName: "Claude Opus 4.6",
     serverType: "bianxie",
     requiresStream: true,
     defaultTemperature: 0.7,

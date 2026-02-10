@@ -1,7 +1,5 @@
 <script lang="ts">
-    import { marked } from "marked";
-    import hljs from "highlight.js";
-    import markedKatex from "marked-katex-extension";
+    import { parseMarkdown } from "./markdown";
     import "highlight.js/styles/github-dark-dimmed.min.css";
     import type { QandA } from "./ChatStore.svelte";
 
@@ -24,56 +22,7 @@
 
     let isRespOngoing = $derived(qandA.isResponseOngoing ?? false);
     let questionHtml = $derived(qandA.question);
-    let answerHtml = $derived(marked.parse(qandA.answer));
-
-    function highlight(code: string, lang: string) {
-        if (hljs.getLanguage(lang)) {
-            return hljs.highlight(code, { language: lang }).value;
-        } else {
-            return hljs.highlightAuto(code).value;
-        }
-    }
-
-    const renderer = {
-        code(_code: string, infostring: any, escaped: any): string {
-            const lang = (infostring || "").match(/\S*/)[0];
-
-            var out = highlight(_code, lang);
-            _code = out;
-            _code = _code.replace(/\n$/, "") + "\n";
-
-            // @ts-ignore
-            const langPrefix = this.options.langPrefix;
-
-            if (!lang || !langPrefix) {
-                return "<pre><code>" + _code + "</code></pre>\n";
-            }
-            return (
-                '<pre><code class="' +
-                langPrefix +
-                lang +
-                '">' +
-                _code +
-                "</code></pre>\n"
-            );
-        },
-        link(
-            href: string,
-            title: string | null | undefined,
-            text: string,
-        ): string {
-            return `<a href="${href}">${text}</a>`;
-        },
-    };
-
-    // @ts-ignore
-    marked.use({ renderer, gfm: true, breaks: true });
-
-    marked.use(
-        markedKatex({
-            throwOnError: false,
-        }),
-    );
+    let answerHtml = $derived(parseMarkdown(qandA.answer));
 
     // showActionButtons state removed in favor of CSS group-hover
 

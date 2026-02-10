@@ -159,8 +159,10 @@
     $effect(() => {
         if (!scrollContainer) return;
 
+        let isDestroyed = false;
         const observer = new IntersectionObserver(
             (entries) => {
+                if (isDestroyed) return;
                 const visible = entries
                     .filter((e) => e.isIntersecting)
                     .sort(
@@ -180,22 +182,30 @@
         );
 
         const refresh = () => {
+            if (isDestroyed || !scrollContainer) return;
             observer.disconnect();
-            scrollContainer?.querySelectorAll(".qa-item").forEach((el) => {
+            scrollContainer.querySelectorAll(".qa-item").forEach((el) => {
                 observer.observe(el);
             });
         };
 
-        // 当消息列表变化时重新监听
+        // 当消息列表结构变化时重新同步观察目标。
+        // Svelte 5 会自动追踪 chatState.chatLog 的依赖。
         chatState.chatLog;
         tick().then(refresh);
 
-        return () => observer.disconnect();
+        return () => {
+            isDestroyed = true;
+            observer.disconnect();
+        };
     });
 
+    let mouseUpTimeout: number | undefined;
+
     function handleMouseUp(e: MouseEvent) {
+        if (mouseUpTimeout) clearTimeout(mouseUpTimeout);
         // Small delay to ensure selection state is updated
-        setTimeout(() => {
+        mouseUpTimeout = window.setTimeout(() => {
             const selection = window.getSelection();
             if (
                 !selection ||
@@ -257,7 +267,10 @@
             }
         };
         window.addEventListener("keydown", quickInputListener);
-        return () => window.removeEventListener("keydown", quickInputListener);
+        return () => {
+            window.removeEventListener("keydown", quickInputListener);
+            if (mouseUpTimeout) clearTimeout(mouseUpTimeout);
+        };
     });
 </script>
 
