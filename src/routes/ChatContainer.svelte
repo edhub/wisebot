@@ -28,7 +28,7 @@
     {#each chatState.chatLog as qa (qa.id)}
         <div
             id="qa-{qa.id}"
-            class="relative transition-all duration-300 qa-item"
+            class="relative transition-all duration-200 qa-item"
         >
             <Message
                 qandA={qa}
@@ -58,11 +58,6 @@
 </div>
 
 <style>
-    /* 针对树状结构的连线效果（可选） */
-    :global(.prose) {
-        max-width: 100%;
-    }
-
     .qa-item {
         /* 使用 content-visibility 优化长列表渲染性能，跳过视口外的渲染工作 */
         content-visibility: auto;

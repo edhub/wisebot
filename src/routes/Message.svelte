@@ -138,10 +138,10 @@
     });
 </script>
 
-<div role="article" class="my-2 group">
+<div role="article" class="group">
     <div class="flex text-xs text-gray-400">
         <div
-            class="h-6 flex-1 flex items-center space-x-3 pl-1 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-200"
+            class="h-6 flex-1 flex items-center space-x-3 pl-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:pointer-events-none md:group-hover:pointer-events-auto transition-opacity duration-200"
         >
             <button
                 onclick={() => {
@@ -163,7 +163,7 @@
         </div>
         <div class="h-6 flex-1 flex items-center justify-end space-x-3 pr-1">
             <div
-                class="flex items-center space-x-3 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-200"
+                class="flex items-center space-x-3 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:pointer-events-none md:group-hover:pointer-events-auto transition-opacity duration-200"
             >
                 <button
                     class="mr-2"
@@ -192,21 +192,21 @@
             <button
                 class="p-0 text-lg transition-opacity duration-200 {qandA.favorite
                     ? 'opacity-100'
-                    : 'opacity-0 group-hover:opacity-100'}"
+                    : 'opacity-100 md:opacity-0 md:group-hover:opacity-100'}"
                 onclick={() => {
                     toggleFavorite(qandA);
                 }}
             >
                 <span
                     class="{qandA.favorite
-                        ? 'text-red-500'
-                        : 'text-gray-500'} font-bold iconify simple-line-icons--star full"
+                        ? 'text-amber-400'
+                        : 'text-gray-400'} font-bold iconify simple-line-icons--star full"
                 >
                 </span>
             </button>
         </div>
     </div>
-    <div class="rounded-md border-gray-200 border overflow-hidden">
+    <div class="rounded-lg border-gray-200 border overflow-hidden">
         <div class="bg-gray-50">
             <div class="h-2 bg-gray-300"></div>
             <article

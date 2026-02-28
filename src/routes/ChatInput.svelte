@@ -150,12 +150,12 @@
             </button>
         </div>
         <div
-            class="flex items-center gap-2 mt-3 text-xs text-gray-500 overflow-x-auto hide-scrollbar pb-1"
+            class="flex items-center gap-2 mt-3 text-xs text-gray-500 overflow-x-auto scrollbar-none pb-1"
         >
             {#each availableModels as model, i}
                 <button
                     type="button"
-                    class="px-2 py-2 rounded transition-colors duration-150 whitespace-nowrap touch-manipulation {lastModel ===
+                    class="px-2 py-2 rounded-xl transition-colors duration-200 whitespace-nowrap touch-manipulation {lastModel ===
                     model
                         ? 'bg-gray-200 font-bold'
                         : 'bg-gray-100 hover:bg-gray-200'}"
@@ -170,11 +170,3 @@
         </div>
     </div>
 </form>
-
-<style>
-    .hide-scrollbar {
-        overflow: auto;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-    }
-</style>

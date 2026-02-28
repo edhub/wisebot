@@ -2,10 +2,49 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Global Resets ── */
+body {
+    overflow: hidden;
+    position: relative;
+}
 
-pre, code {
-    white-space: pre-wrap; /* Preserve spacing but wrap lines */
-    word-wrap: break-word; /* Break long words if needed */
-    overflow-wrap: break-word; /* Modern alternative to word-wrap */
-    max-width: 100%; /* Ensure it doesn't overflow its container */
-  }
+pre,
+code {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+}
+
+/* 覆盖 @tailwindcss/typography 默认 max-width */
+.prose {
+    max-width: 100%;
+}
+
+/* ── Scrollbar Utilities ── */
+@layer utilities {
+    /* 细滚动条（侧边栏、主滚动区等） */
+    .scrollbar-thin::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+    }
+    .scrollbar-thin::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+        background: #e5e7eb;
+        border-radius: 10px;
+    }
+    .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+        background: #d1d5db;
+    }
+
+    /* 完全隐藏滚动条 */
+    .scrollbar-none {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    .scrollbar-none::-webkit-scrollbar {
+        display: none;
+    }
+}

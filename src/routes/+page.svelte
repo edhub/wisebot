@@ -134,7 +134,7 @@
             scrollContainer.style.overflow = "hidden";
             setTimeout(() => {
                 if (scrollContainer) scrollContainer.style.overflow = "auto";
-                // 500ms 内屏蔽滚动回调，防止剩余惯性将输入框再次“压”回去
+                // 500ms 内屏蔽滚动回调，防止剩余惯性将输入框再次"压"回去
                 setTimeout(() => {
                     ignoreScroll = false;
                 }, 500);
@@ -252,7 +252,7 @@
             const text = selectionInfo.text;
             handleFollowUp(qa);
             tick().then(() => {
-                chatInput?.setQuestion(`关于“${text}”：\n`, qa);
+                chatInput?.setQuestion(`关于"${text}"：\n`, qa);
             });
         }
         selectionInfo = null;
@@ -350,7 +350,7 @@
                     </div>
                     <div class="flex justify-between items-center px-2 mt-3">
                         <p class="text-xs text-gray-500/80">
-                            开启新问题或点击“追问”建立跟贴分支。
+                            开启新问题或点击"追问"建立跟贴分支。
                         </p>
                         <p class="text-xs text-gray-500/80 font-medium">
                             ESC 收起
@@ -364,7 +364,7 @@
         <div
             bind:this={scrollContainer}
             onscroll={handleScroll}
-            class="flex-1 overflow-y-auto scroll-smooth hide-scrollbar pt-6"
+            class="flex-1 overflow-y-auto scroll-smooth scrollbar-thin pt-6"
         >
             <div class="max-w-4xl mx-auto w-full px-4 md:px-2 pb-8">
                 <ChatContainer
@@ -413,23 +413,3 @@
 
 <Menu bind:showMenu clearChat={clearNonFavoriteChats} />
 <ConfirmDialog />
-
-<style>
-    :global(body) {
-        overflow: hidden;
-    }
-
-    .hide-scrollbar::-webkit-scrollbar {
-        width: 6px;
-    }
-    .hide-scrollbar::-webkit-scrollbar-track {
-        background: transparent;
-    }
-    .hide-scrollbar::-webkit-scrollbar-thumb {
-        background: #e5e7eb;
-        border-radius: 10px;
-    }
-    .hide-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: #d1d5db;
-    }
-</style>

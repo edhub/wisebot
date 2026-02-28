@@ -51,10 +51,3 @@
         </div>
     </div>
 {/if}
-
-<style>
-    /* Ensure the dialog is always on top */
-    :global(body) {
-        position: relative;
-    }
-</style>

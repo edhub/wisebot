@@ -70,7 +70,7 @@
     <div class="flex flex-col min-w-0">
         <div class="group relative flex items-center min-w-0">
             <button
-                class="flex-1 min-w-0 group/msg text-left px-2 py-1 rounded-lg transition-colors flex items-center gap-2 touch-manipulation {qa.id === activeId
+                class="flex-1 min-w-0 group/msg text-left px-2 py-1 rounded-xl transition-colors flex items-center gap-2 touch-manipulation {qa.id === activeId
                     ? 'bg-blue-50/50 text-blue-600 font-medium'
                     : 'hover:bg-gray-100/40 ' + (qa.isResponseOngoing ? 'text-blue-400/80' : 'text-gray-400 hover:text-gray-600')}"
                 onclick={() => scrollToMessage(qa.id)}
@@ -85,7 +85,7 @@
 
             <!-- Action Buttons -->
             <button
-                class="{qa.favorite ? 'opacity-100 text-amber-400' : 'opacity-40 md:opacity-0 md:group-hover:opacity-100 text-gray-300 hover:text-amber-400'} p-1 rounded hover:bg-amber-50 transition-all ml-1 touch-manipulation"
+                class="{qa.favorite ? 'opacity-100 text-amber-400' : 'opacity-40 md:opacity-0 md:group-hover:opacity-100 text-gray-300 hover:text-amber-400'} p-1 rounded-xl hover:bg-amber-50 transition-all ml-1 touch-manipulation"
                 onclick={(e) => {
                     e.stopPropagation();
                     toggleFavorite(qa);
@@ -118,11 +118,11 @@
                         {group.label}
                     </h3>
                     <button
-                        class="p-1 rounded hover:bg-red-50 text-gray-300 hover:text-red-400 transition-colors opacity-40 md:opacity-0 md:group-hover/section:opacity-100 touch-manipulation"
+                        class="p-1 rounded-xl hover:bg-red-50 text-gray-300 hover:text-red-400 transition-colors opacity-40 md:opacity-0 md:group-hover/section:opacity-100 touch-manipulation"
                         onclick={() => {
                             openConfirm(
                                 "清除非收藏",
-                                `确定要清空“${group.label}”中所有未收藏的对话吗？`,
+                                `确定要清空"${group.label}"中所有未收藏的对话吗？`,
                                 () => deleteGroup(group.items)
                             );
                         }}
@@ -150,7 +150,7 @@
         <div class="flex items-center justify-between px-1">
             <div class="flex items-center gap-3 min-w-0">
                 <div
-                    class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-300 flex-shrink-0"
+                    class="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center text-gray-300 flex-shrink-0"
                 >
                     <span class="iconify simple-line-icons--energy text-xs"></span>
                 </div>
@@ -165,7 +165,7 @@
             </div>
 
             <button
-                class="hidden md:block p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-blue-600 transition-all ml-2 touch-manipulation"
+                class="hidden md:block p-2 rounded-xl hover:bg-gray-100 text-gray-400 hover:text-blue-600 transition-all ml-2 touch-manipulation"
                 onclick={() => (showMenu = true)}
                 title="配置与设置"
             >
@@ -174,19 +174,3 @@
         </div>
     </div>
 </div>
-
-<style>
-    .scrollbar-thin::-webkit-scrollbar {
-        width: 3px;
-    }
-    .scrollbar-thin::-webkit-scrollbar-track {
-        background: transparent;
-    }
-    .scrollbar-thin::-webkit-scrollbar-thumb {
-        background: #e5e7eb;
-        border-radius: 10px;
-    }
-    .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-        background: #d1d5db;
-    }
-</style>

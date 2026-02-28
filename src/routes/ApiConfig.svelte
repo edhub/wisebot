@@ -31,7 +31,7 @@
         <p class="mt-2 mb-1">便携 API Key</p>
         <div
             onclick={(e) => e.stopPropagation()}
-            class="rounded bg-gray-200 p-2 overflow-clip"
+            class="rounded-xl bg-gray-200 p-2 overflow-clip"
         >
             <InplaceEdit bind:value={bianxieApiKey} />
         </div>
@@ -41,7 +41,7 @@
         <p class="mt-2 mb-1">阿里云 API Key</p>
         <div
             onclick={(e) => e.stopPropagation()}
-            class="rounded bg-gray-200 p-2 overflow-clip"
+            class="rounded-xl bg-gray-200 p-2 overflow-clip"
         >
             <InplaceEdit bind:value={aliyunApiKey} />
         </div>
@@ -51,7 +51,7 @@
         <p class="mt-2 mb-1">DeepSeek API Key</p>
         <div
             onclick={(e) => e.stopPropagation()}
-            class="rounded bg-gray-200 p-2 overflow-clip"
+            class="rounded-xl bg-gray-200 p-2 overflow-clip"
         >
             <InplaceEdit bind:value={deepseekApiKey} />
         </div>

@@ -35,10 +35,10 @@ export const MODELS: Record<string, ModelConfig> = {
     requiresStream: true,
     defaultTemperature: 0.7,
   },
-  "gemini-3-pro-preview": {
+  "gemini-3.1-pro-preview": {
     // $1.25 - $10
-    displayName: "Ge3 Pro",
-    fullName: "Gemini 3.0 Pro",
+    displayName: "Ge3.1 Pro",
+    fullName: "Gemini 3.1 Pro",
     serverType: "bianxie",
     requiresStream: true,
     defaultTemperature: 0.7,
