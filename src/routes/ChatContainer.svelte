@@ -8,7 +8,7 @@
     } from "./ChatStore.svelte";
 
     let { resendMessage, onFollowUp } = $props<{
-        resendMessage: (msg: string, image?: string) => void;
+        resendMessage: (msg: string, image?: string, imageUrl?: string) => void;
         onFollowUp: (qa: QandA) => void;
     }>();
 
@@ -32,7 +32,8 @@
         >
             <Message
                 qandA={qa}
-                onResendMessage={(msg) => resendMessage(msg, qa.image)}
+                onResendMessage={(msg) =>
+                    resendMessage(msg, qa.image, qa.imageUrl)}
                 {deleteQA}
                 {toggleFavorite}
                 {onFollowUp}

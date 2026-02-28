@@ -12,6 +12,7 @@
         saveChatLog,
         addMessage,
         openConfirm,
+        initChatStore,
         type QandA,
     } from "./ChatStore.svelte";
     import { MODELS } from "./model_config";
@@ -33,6 +34,10 @@
     let isScrolled = $state(true);
     let ignoreScroll = false;
 
+    $effect(() => {
+        initChatStore();
+    });
+
     function handleScroll() {
         if (!scrollContainer || ignoreScroll) return;
         if (scrollContainer.scrollTop > 50) {
@@ -46,8 +51,9 @@
         message: string,
         lastQA?: QandA,
         image?: string,
+        imageUrl?: string,
     ) {
-        if (message.trim() === "") return;
+        if (message.trim() === "" && !imageUrl) return;
 
         isScrolled = true;
         const startTime = Date.now();
@@ -60,6 +66,7 @@
             botName: MODELS[model]?.fullName || model,
             isResponseOngoing: true,
             image: image,
+            imageUrl: imageUrl,
             createTime: Date.now(),
         };
 
@@ -76,12 +83,14 @@
             el.scrollIntoView({ behavior: "smooth", block: "start" });
         }
 
+        // If image is a storage ID (from saveImage), we need to get its actual content/url for query
+        // But for now, image holds the ID and imageUrl holds the data/blob URL
         const deltaReader = query(
             model,
             message,
             lastQA,
             MODELS[model]?.defaultTemperature ?? 0.7,
-            image,
+            imageUrl,
         );
         let isFirstResponse = true;
         let buffer = "";
@@ -125,8 +134,12 @@
         });
     }
 
-    function handleResendMessage(message: string, image?: string) {
-        expandInput(message, undefined, image);
+    function handleResendMessage(
+        message: string,
+        image?: string,
+        imageUrl?: string,
+    ) {
+        expandInput(message, undefined, imageUrl || image);
     }
 
     function handleFollowUp(qa: QandA) {
@@ -376,7 +389,8 @@
         >
             <div class="max-w-4xl mx-auto w-full px-4 md:px-2 pb-8">
                 <ChatContainer
-                    resendMessage={(msg, img) => handleResendMessage(msg, img)}
+                    resendMessage={(msg, img, imgUrl) =>
+                        handleResendMessage(msg, img, imgUrl)}
                     onFollowUp={handleFollowUp}
                 />
             </div>

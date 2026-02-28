@@ -72,12 +72,17 @@ export async function* query(
   const languageModel = createLanguageModel(model, modelConfig);
 
   let hasReasoningContent = false;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => {
+    controller.abort();
+  }, 120000); // 120 seconds timeout
 
   try {
     const result = streamText({
       model: languageModel,
       messages: messages as any,
       temperature,
+      abortSignal: controller.signal,
       onError({ error }) {
         console.error("[AI SDK streamText] Error:", error);
       },
@@ -121,6 +126,11 @@ export async function* query(
     }
   } catch (e: any) {
     console.error("[query] Error:", e);
-    yield `出错啦: ${e.message || "未知错误"}`;
+    const isAbort = e.name === "AbortError" || e.message?.includes("aborted");
+    yield isAbort
+      ? "\n\n[请求超时: 120秒未响应，已中断]"
+      : `出错啦: ${e.message || "未知错误"}`;
+  } finally {
+    clearTimeout(timeoutId);
   }
 }

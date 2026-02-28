@@ -14,7 +14,11 @@
         onFollowUp,
     }: {
         qandA: QandA;
-        onResendMessage?: (message: string, image?: string) => void;
+        onResendMessage?: (
+            message: string,
+            image?: string,
+            imageUrl?: string,
+        ) => void;
         deleteQA: (qa: QandA) => void;
         toggleFavorite: (qa: QandA) => void;
         onFollowUp?: (qa: QandA) => void;
@@ -145,7 +149,11 @@
         >
             <button
                 onclick={() => {
-                    onResendMessage?.(qandA.question, qandA.image);
+                    onResendMessage?.(
+                        qandA.question,
+                        qandA.image,
+                        qandA.imageUrl,
+                    );
                 }}
             >
                 再次发送
@@ -213,10 +221,10 @@
                 class="prose py-2 px-4 max-w-none text-gray-800"
                 onclick={handleUrlNavigation}
             >
-                {#if qandA.image}
+                {#if qandA.imageUrl}
                     <div class="mb-3">
                         <img
-                            src={qandA.image}
+                            src={qandA.imageUrl}
                             alt="User uploaded"
                             class="max-h-64 rounded-lg border border-gray-200 shadow-sm"
                         />

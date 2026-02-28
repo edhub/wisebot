@@ -10,6 +10,7 @@
             message: string,
             lastQA?: QandA,
             image?: string,
+            imageUrl?: string,
         ) => void;
         onEscape?: () => void;
     }>();
@@ -30,6 +31,8 @@
         localStorage.setItem(KEY_LAST_MODEL, model);
     }
 
+    import { saveImage, generateId } from "./ChatStore.svelte";
+
     async function resizeTextarea() {
         await tick();
         textarea.style.height = "auto";
@@ -38,10 +41,20 @@
         textarea.style.height = desiredHeight + "px";
     }
 
-    function handleSendMessage(model: string) {
+    async function handleSendMessage(model: string) {
         saveLastModel(model);
         if (question.trim() || imageBase64) {
-            onSendMessage(model, question, lastQA, imageBase64);
+            let imageId: string | undefined = undefined;
+            let imageUrl: string | undefined = undefined;
+
+            if (imageBase64) {
+                imageId = generateId();
+                await saveImage(imageId, imageBase64);
+                // Create a temporary object URL for immediate display
+                imageUrl = imageBase64;
+            }
+
+            onSendMessage(model, question, lastQA, imageId, imageUrl);
             question = "";
             imageBase64 = undefined;
             lastQA = undefined;
@@ -128,6 +141,9 @@
 
     export function setQuestion(text: string, qa?: QandA, image?: string) {
         question = text;
+        // If image is an ID from IndexedDB, we'd need to fetch it,
+        // but for 'resend' we can use the existing imageUrl if available.
+        // For simplicity in this UI, we'll try to use the imageUrl from the QA object via the caller.
         imageBase64 = image;
         textarea.focus();
         resizeTextarea();
