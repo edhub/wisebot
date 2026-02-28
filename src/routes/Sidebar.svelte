@@ -92,7 +92,7 @@
                 }}
                 title={qa.favorite ? "取消收藏" : "收藏"}
             >
-                <span class="iconify simple-line-icons--star text-[10px]"></span>
+                <span class="iconify simple-line-icons--star text-sm"></span>
             </button>
 
 
@@ -113,8 +113,8 @@
     <div class="flex-1 overflow-y-auto px-3 py-4 space-y-6 scrollbar-thin">
         {#each groupedRoots as group}
             <div transition:slide={{ duration: 200 }} class="group/section">
-                <div class="flex items-center justify-between px-2 mb-1.5">
-                    <h3 class="text-[10px] font-medium text-gray-400/50 uppercase tracking-[0.1em]">
+                <div class="flex items-center justify-between px-1 mb-1.5">
+                    <h3 class="font-light text-gray-500 uppercase tracking-[0.1em]">
                         {group.label}
                     </h3>
                     <button
@@ -128,7 +128,7 @@
                         }}
                         title="清除非收藏对话"
                     >
-                        <span class="iconify simple-line-icons--trash text-[10px]"></span>
+                        <span class="iconify simple-line-icons--trash text-sm"></span>
                     </button>
                 </div>
                 <div class="space-y-0.5">
@@ -140,7 +140,7 @@
         {:else}
             <div class="flex flex-col items-center justify-center py-20 text-gray-300 opacity-40">
                 <span class="iconify simple-line-icons--bubble text-3xl mb-2"></span>
-                <p class="text-[10px]">暂无提问记录</p>
+                <p class="text-sm">暂无提问记录</p>
             </div>
         {/each}
     </div>
@@ -158,7 +158,7 @@
                     <p class="text-xs font-semibold text-gray-400 truncate tracking-tight">
                         Wise Bot
                     </p>
-                    <p class="text-[10px] text-gray-400/50 truncate">
+                    <p class="text-[11px] text-gray-400/50 truncate">
                         结构化对话树
                     </p>
                 </div>
