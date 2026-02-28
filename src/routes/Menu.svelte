@@ -26,7 +26,7 @@
                 e.stopPropagation();
             }}
             transition:slide={{ duration: 200, axis: "x" }}
-            class="fixed top-0 right-0 h-full w-80 max-w-[calc(100vw-3rem)] overflow-auto bg-white border-l border-gray-200 z-[101]"
+            class="fixed top-0 left-0 h-full w-80 max-w-[calc(100vw-3rem)] overflow-auto bg-white border-r border-gray-200 z-[101]"
         >
             <div class="w-full p-4">
                 <ApiConfig />

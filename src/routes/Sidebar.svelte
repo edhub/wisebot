@@ -70,13 +70,13 @@
     <div class="flex flex-col min-w-0">
         <div class="group relative flex items-center min-w-0">
             <button
-                class="flex-1 min-w-0 group/msg text-left px-2 py-1 rounded-xl transition-colors flex items-center gap-2 touch-manipulation {qa.id === activeId
+                class="flex-1 min-w-0 group/msg text-left px-1 py-1 rounded-xl transition-colors flex items-center gap-2 touch-manipulation {qa.id === activeId
                     ? 'bg-blue-50/50 text-blue-600 font-medium'
-                    : 'hover:bg-gray-100/40 ' + (qa.isResponseOngoing ? 'text-blue-400/80' : 'text-gray-400 hover:text-gray-600')}"
+                    : 'hover:bg-gray-200/40 ' + (qa.isResponseOngoing ? 'text-blue-500/80' : 'text-gray-500 font-light hover:text-gray-700')}"
                 onclick={() => scrollToMessage(qa.id)}
             >
-                <span class="{qa.id === activeId ? 'text-blue-400 opacity-60' : 'text-gray-300 opacity-20'} font-mono flex-shrink-0 w-3 text-center">
-                    {level === 0 ? "•" : "└"}
+                <span class="{qa.id === activeId ? 'text-blue-400 opacity-60' : 'text-gray-500 opacity-50'} font-mono flex-shrink-0 text-center">
+                    {level === 0 ? "" : "└"}
                 </span>
                 <span class="truncate flex-1">
                     {qa.question.trim() || "未提问"}
@@ -99,7 +99,7 @@
         </div>
 
         {#if children.length > 0}
-            <div class="ml-2.5 pl-2 border-l border-gray-100/30 space-y-0.5">
+            <div class="ml-1.5 pl-1 border-l border-gray-100/30 space-y-0.5">
                 {#each children as child (child.id)}
                     {@render MessageNode(child, level + 1)}
                 {/each}
@@ -108,7 +108,7 @@
     </div>
 {/snippet}
 
-<div class="flex flex-col h-full bg-white w-full overflow-hidden select-none">
+<div class="flex flex-col h-full pt-4 bg-gray-100/30 w-full overflow-hidden select-none">
     <!-- Message Tree List -->
     <div class="flex-1 overflow-y-auto px-3 py-4 space-y-6 scrollbar-thin">
         {#each groupedRoots as group}
@@ -146,7 +146,7 @@
     </div>
 
     <!-- Footer: User & Settings -->
-    <div class="p-4 border-t border-gray-100/20 bg-gray-50/50 backdrop-blur-[2px]">
+    <div class="p-4 border-t border-gray-100/20 bg-gray-100/30 backdrop-blur-[2px]">
         <div class="flex items-center justify-between px-1">
             <div class="flex items-center gap-3 min-w-0">
                 <div

@@ -387,7 +387,7 @@
             onscroll={handleScroll}
             class="flex-1 overflow-y-auto scroll-smooth scrollbar-thin pt-6"
         >
-            <div class="max-w-4xl mx-auto w-full px-4 md:px-2 pb-8">
+            <div class="max-w-5xl mx-auto w-full px-4 md:px-2 pb-8">
                 <ChatContainer
                     resendMessage={(msg, img, imgUrl) =>
                         handleResendMessage(msg, img, imgUrl)}
