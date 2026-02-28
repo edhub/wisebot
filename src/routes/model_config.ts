@@ -1,20 +1,30 @@
+import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
+import { createDeepSeek } from "@ai-sdk/deepseek";
+import type { LanguageModel } from "ai";
+
 export interface ServerConfig {
   baseUrl: string;
   apiKeyStorageKey: string;
+  /** Provider name used by AI SDK's createOpenAICompatible */
+  providerName: string;
 }
 
 export const SERVERS: Record<string, ServerConfig> = {
   deepseek: {
     baseUrl: "/api/deepseek",
     apiKeyStorageKey: "key_deepseek_api_key",
+    providerName: "deepseek",
   },
   bianxie: {
-    baseUrl: "https://api.bianxie.ai/v1/chat/completions",
+    baseUrl: "https://api.bianxie.ai/v1",
     apiKeyStorageKey: "key_bian_xie_api_key",
+
+    providerName: "bianxie",
   },
   aliyun: {
     baseUrl: "/api/aliyun",
     apiKeyStorageKey: "key_aliyun_api_key",
+    providerName: "aliyun",
   },
 };
 
@@ -93,6 +103,35 @@ export function getServerConfig(
   serverType: keyof typeof SERVERS,
 ): ServerConfig {
   return SERVERS[serverType];
+}
+
+/**
+ * 根据 serverType 和 model name 创建 AI SDK 的 LanguageModel 实例。
+ * 在客户端运行，使用 localStorage 中存储的 API key。
+ */
+export function createLanguageModel(
+  modelName: string,
+  modelConfig: ModelConfig,
+): LanguageModel {
+  const serverConfig = getServerConfig(modelConfig.serverType);
+  const apiKey = getApiKey(modelConfig.serverType);
+
+  if (modelConfig.serverType === "deepseek") {
+    // 使用 @ai-sdk/deepseek provider（它内部也是基于 openai-compatible）
+    const deepseek = createDeepSeek({
+      baseURL: serverConfig.baseUrl,
+      apiKey: apiKey || "sk-placeholder",
+    });
+    return deepseek(modelName);
+  }
+
+  // 其他服务端点统一使用 openai-compatible provider
+  const provider = createOpenAICompatible({
+    name: serverConfig.providerName,
+    baseURL: serverConfig.baseUrl,
+    apiKey: apiKey || "sk-placeholder",
+  });
+  return provider(modelName);
 }
 
 // 存储当前选择的模型

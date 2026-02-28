@@ -5,6 +5,7 @@
 
 ### 技术栈
 - **框架**: Svelte 5 (Runes API) + SvelteKit
+- **AI SDK**: Vercel AI SDK 6.0 (`ai` + `@ai-sdk/deepseek` + `@ai-sdk/openai-compatible`)
 - **样式**: Tailwind CSS + Typography
 - **Markdown**: Marked + KaTeX + Highlight.js
 - **适配器**: `@sveltejs/adapter-static` (SSG)
@@ -30,9 +31,15 @@
 - **全局对话框**: `confirmState` 管理全局确认弹窗，解耦组件与逻辑。
 
 ### 2. 模型与 API 调用 (`query_api.ts` & `model_config.ts`)
-- **配置管理**: `SERVERS` 定义端点（DeepSeek, 阿里, 便携等），`MODELS` 定义参数。
-- **流式处理**: 使用 `async generator` 处理 SSE。支持 DeepSeek R1 的 `reasoning_content`（思考过程）渲染。
-- **代理支持**: 开发环境下通过 Vite Proxy 绕过 CORS。
+- **AI SDK 集成**: 使用 Vercel AI SDK 6.0 的 `streamText` + `fullStream` 进行流式调用，替代了手写的 SSE 解析。
+- **Provider 体系**: 
+  - DeepSeek 端点使用 `@ai-sdk/deepseek`（`createDeepSeek`），原生支持 `reasoning_content` 解析。
+  - 便携(bianxie)和阿里云端点使用 `@ai-sdk/openai-compatible`（`createOpenAICompatible`），通用 OpenAI 兼容方案。
+- **模型工厂**: `createLanguageModel()` 根据 `serverType` 自动选择 provider 并创建 `LanguageModel` 实例，API key 从 `localStorage` 读取。
+- **流式事件处理**: 通过 `fullStream` 的 `reasoning-delta`（思考过程）和 `text-delta`（正文）事件类型区分输出，reasoning 渲染为 blockquote 格式。
+- **配置管理**: `SERVERS` 定义端点 base URL 和 provider 名称，`MODELS` 定义模型参数。
+- **代理支持**: 开发环境下通过 Vite Proxy 绕过 CORS（proxy target 为不含 `/chat/completions` 的 base URL，由 AI SDK 自动拼接路径）。
+- **纯客户端架构**: 本项目使用 `adapter-static`，无服务端路由。AI SDK 的 provider 直接在浏览器中运行，不走 SvelteKit 的 `+server.ts`。
 
 ### 3. 组件系统
 - **`+page.svelte`**: 主协调器，负责滚动管理、选中文字追问逻辑。
@@ -80,6 +87,7 @@
 - `npm run check`: TypeScript & Svelte 类型检查
 
 ## 💡 扩展指南
-- **新增模型**: 在 `model_config.ts` 的 `MODELS` 中添加配置。
+- **新增模型**: 在 `model_config.ts` 的 `MODELS` 中添加配置（指定 `serverType` 关联到已有的 `SERVERS` 端点）。
+- **新增 API 端点**: 在 `SERVERS` 中添加条目（含 `baseUrl`、`apiKeyStorageKey`、`providerName`），并在 `createLanguageModel()` 中按需选择 `createDeepSeek` 或 `createOpenAICompatible`。
 - **自定义渲染**: 修改 `Message.svelte` 中的 `marked` 配置或渲染逻辑。
 - **持久化方案**: 目前使用 `localStorage`，若数据量过大可考虑迁移至 `IndexedDB`。
