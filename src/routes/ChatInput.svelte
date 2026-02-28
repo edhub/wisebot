@@ -5,12 +5,19 @@
     const KEY_LAST_MODEL = "last_used_model";
 
     let { onSendMessage, onEscape } = $props<{
-        onSendMessage: (model: string, message: string, lastQA?: QandA) => void;
+        onSendMessage: (
+            model: string,
+            message: string,
+            lastQA?: QandA,
+            image?: string,
+        ) => void;
         onEscape?: () => void;
     }>();
 
     let question = $state("");
+    let imageBase64 = $state<string | undefined>(undefined);
     let textarea: HTMLTextAreaElement;
+    let fileInput: HTMLInputElement;
     let lastQA = $state<QandA | undefined>(undefined);
 
     const availableModels = Object.keys(MODELS);
@@ -33,9 +40,10 @@
 
     function handleSendMessage(model: string) {
         saveLastModel(model);
-        if (question.trim()) {
-            onSendMessage(model, question, lastQA);
+        if (question.trim() || imageBase64) {
+            onSendMessage(model, question, lastQA, imageBase64);
             question = "";
+            imageBase64 = undefined;
             lastQA = undefined;
             resizeTextarea();
             textarea.blur();
@@ -72,6 +80,35 @@
         }
     }
 
+    function handlePaste(e: ClipboardEvent) {
+        const items = e.clipboardData?.items;
+        if (!items) return;
+
+        for (const item of items) {
+            if (item.type.indexOf("image") !== -1) {
+                const file = item.getAsFile();
+                if (file) {
+                    processFile(file);
+                }
+            }
+        }
+    }
+
+    function handleFileChange(e: Event) {
+        const target = e.target as HTMLInputElement;
+        if (target.files && target.files[0]) {
+            processFile(target.files[0]);
+        }
+    }
+
+    function processFile(file: File) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            imageBase64 = e.target?.result as string;
+        };
+        reader.readAsDataURL(file);
+    }
+
     $effect(() => {
         // 添加全局快捷键监听
         const globalShortcutListener = (e: KeyboardEvent) => {
@@ -89,8 +126,9 @@
             window.removeEventListener("keydown", globalShortcutListener);
     });
 
-    export function setQuestion(text: string, qa?: QandA) {
+    export function setQuestion(text: string, qa?: QandA, image?: string) {
         question = text;
+        imageBase64 = image;
         textarea.focus();
         resizeTextarea();
         lastQA = qa;
@@ -112,6 +150,22 @@
 <!-- svelte-ignore a11y_consider_explicit_label -->
 <form class="flex flex-col">
     <div class="px-2 pb-2">
+        {#if imageBase64}
+            <div class="relative inline-block mb-2 group">
+                <img
+                    src={imageBase64}
+                    alt="Preview"
+                    class="max-h-32 rounded-lg border border-gray-200"
+                />
+                <button
+                    type="button"
+                    class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                    onclick={() => (imageBase64 = undefined)}
+                >
+                    ✕
+                </button>
+            </div>
+        {/if}
         {#if lastQA}
             <div
                 class="flex items-center justify-between px-2 text-sm text-gray-600"
@@ -129,22 +183,41 @@
             </div>
         {/if}
         <div class="relative flex items-end gap-2 mt-2">
-            <textarea
-                bind:this={textarea}
-                id="chat-input"
-                placeholder="⌘+k 输入消息..."
-                bind:value={question}
-                class="p-2 resize-none w-full rounded-xl border border-gray-200 flex-grow focus:outline-none transition-all touch-manipulation"
-                rows="1"
-                maxlength="10000"
-                onkeydown={handleKeyDown}
-                oninput={resizeTextarea}
-            ></textarea>
+            <div class="relative flex-grow">
+                <textarea
+                    bind:this={textarea}
+                    id="chat-input"
+                    placeholder="输入消息或粘贴图片..."
+                    bind:value={question}
+                    class="p-2 pr-10 resize-none w-full rounded-xl border border-gray-200 focus:outline-none transition-all touch-manipulation"
+                    rows="1"
+                    maxlength="10000"
+                    onkeydown={handleKeyDown}
+                    oninput={resizeTextarea}
+                    onpaste={handlePaste}
+                ></textarea>
+                <button
+                    type="button"
+                    class="absolute right-2 bottom-2 p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                    onclick={() => fileInput.click()}
+                    title="上传图片"
+                >
+                    <span class="iconify simple-line-icons--picture text-lg"
+                    ></span>
+                </button>
+                <input
+                    type="file"
+                    bind:this={fileInput}
+                    accept="image/*"
+                    class="hidden"
+                    onchange={handleFileChange}
+                />
+            </div>
             <button
                 type="button"
                 class="flex-shrink-0 w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center hover:bg-blue-700 active:scale-95 transition-all disabled:opacity-30 disabled:grayscale disabled:active:scale-100 touch-manipulation"
                 onclick={() => handleSendMessage(lastModel)}
-                disabled={!question.trim()}
+                disabled={!question.trim() && !imageBase64}
             >
                 <span class="iconify simple-line-icons--plus text-lg"></span>
             </button>

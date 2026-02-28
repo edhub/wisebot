@@ -2,19 +2,38 @@ import type { QandA } from "./ChatStore.svelte";
 import { getModelConfig, getApiKey, createLanguageModel } from "./model_config";
 import { streamText } from "ai";
 
-interface Message {
-  role: "user" | "assistant" | "system";
-  content: string;
-}
+function prepareMessages(message: string, image?: string, lastQA?: QandA) {
+  const messages: any[] = [];
 
-function prepareMessages(message: string, lastQA?: QandA): Message[] {
-  return lastQA
-    ? [
-        { role: "user" as const, content: lastQA.question },
-        { role: "assistant" as const, content: lastQA.answer },
-        { role: "user" as const, content: message },
-      ]
-    : [{ role: "user" as const, content: message }];
+  if (lastQA) {
+    // 历史消息：如果历史消息有图片，也需要以数组形式传递 content
+    if (lastQA.image) {
+      messages.push({
+        role: "user",
+        content: [
+          { type: "text", text: lastQA.question },
+          { type: "image", image: lastQA.image },
+        ],
+      });
+    } else {
+      messages.push({ role: "user", content: lastQA.question });
+    }
+    messages.push({ role: "assistant", content: lastQA.answer });
+  }
+
+  // 当前消息
+  if (image) {
+    messages.push({
+      role: "user",
+      content: [
+        { type: "text", text: message },
+        { type: "image", image: image },
+      ],
+    });
+  } else {
+    messages.push({ role: "user", content: message });
+  }
+  return messages;
 }
 
 function validateApiKey(
@@ -38,6 +57,7 @@ export async function* query(
   message: string,
   lastQA?: QandA,
   temperature: number = 0.7,
+  image?: string,
 ) {
   const modelConfig = getModelConfig(model);
   const apiKey = getApiKey(modelConfig.serverType);
@@ -48,7 +68,7 @@ export async function* query(
     return;
   }
 
-  const messages = prepareMessages(message, lastQA);
+  const messages = prepareMessages(message, image, lastQA);
   const languageModel = createLanguageModel(model, modelConfig);
 
   let hasReasoningContent = false;
@@ -56,7 +76,7 @@ export async function* query(
   try {
     const result = streamText({
       model: languageModel,
-      messages,
+      messages: messages as any,
       temperature,
       onError({ error }) {
         console.error("[AI SDK streamText] Error:", error);

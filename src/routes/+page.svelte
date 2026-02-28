@@ -20,7 +20,7 @@
     let showMenu = $state(false);
     let showSidebar = $state(false);
     let activeId = $state<string | null>(null);
-    let chatInput: ChatInput;
+    let chatInput = $state<ChatInput>();
 
     // Selection follow-up state
     let selectionInfo = $state<{
@@ -45,6 +45,7 @@
         model: string,
         message: string,
         lastQA?: QandA,
+        image?: string,
     ) {
         if (message.trim() === "") return;
 
@@ -58,6 +59,7 @@
             answer: "",
             botName: MODELS[model]?.fullName || model,
             isResponseOngoing: true,
+            image: image,
             createTime: Date.now(),
         };
 
@@ -74,7 +76,13 @@
             el.scrollIntoView({ behavior: "smooth", block: "start" });
         }
 
-        const deltaReader = query(model, message, lastQA);
+        const deltaReader = query(
+            model,
+            message,
+            lastQA,
+            MODELS[model]?.defaultTemperature ?? 0.7,
+            image,
+        );
         let isFirstResponse = true;
         let buffer = "";
         let lastUpdateTime = Date.now();
@@ -117,15 +125,15 @@
         });
     }
 
-    function handleResendMessage(message: string) {
-        expandInput(message);
+    function handleResendMessage(message: string, image?: string) {
+        expandInput(message, undefined, image);
     }
 
     function handleFollowUp(qa: QandA) {
         expandInput("", qa);
     }
 
-    function expandInput(text?: string, qa?: QandA) {
+    function expandInput(text?: string, qa?: QandA, image?: string) {
         ignoreScroll = true;
         isScrolled = false;
 
@@ -144,8 +152,8 @@
         }
         // 使用 tick 确保在 DOM 状态切换后执行聚焦
         tick().then(() => {
-            if (text !== undefined || qa !== undefined) {
-                chatInput?.setQuestion(text ?? "", qa);
+            if (text !== undefined || qa !== undefined || image !== undefined) {
+                chatInput?.setQuestion(text ?? "", qa, image);
             }
             const el = document.getElementById("chat-input");
             if (el) {
@@ -368,7 +376,7 @@
         >
             <div class="max-w-4xl mx-auto w-full px-4 md:px-2 pb-8">
                 <ChatContainer
-                    resendMessage={handleResendMessage}
+                    resendMessage={(msg, img) => handleResendMessage(msg, img)}
                     onFollowUp={handleFollowUp}
                 />
             </div>
@@ -399,7 +407,7 @@
                 transition:fade={{ duration: 200 }}
             >
                 <button
-                    onclick={expandInput}
+                    onclick={() => expandInput()}
                     class="group flex items-center justify-center w-12 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-2xl shadow-blue-200 transition-all active:scale-95 touch-manipulation"
                     title="提出新问题"
                 >

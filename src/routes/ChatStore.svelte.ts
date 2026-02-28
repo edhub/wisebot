@@ -10,6 +10,7 @@ export interface QandA {
   firstResponseTime?: number;
   completionTime?: number;
   isResponseOngoing?: boolean;
+  image?: string;
   createTime: number;
 }
 
