@@ -7,6 +7,8 @@ export interface ServerConfig {
   apiKeyStorageKey: string;
   /** Provider name used by AI SDK's createOpenAICompatible */
   providerName: string;
+  /** API key 注册/购买页面，显示在未设置 key 的提示中 */
+  signupUrl: string;
 }
 
 export const SERVERS: Record<string, ServerConfig> = {
@@ -14,17 +16,19 @@ export const SERVERS: Record<string, ServerConfig> = {
     baseUrl: "/api/deepseek",
     apiKeyStorageKey: "key_deepseek_api_key",
     providerName: "deepseek",
+    signupUrl: "https://platform.deepseek.com/",
   },
   bianxie: {
     baseUrl: "https://api.bianxie.ai/v1",
     apiKeyStorageKey: "key_bian_xie_api_key",
-
     providerName: "bianxie",
+    signupUrl: "https://api.bianxie.ai",
   },
   aliyun: {
     baseUrl: "/api/aliyun",
     apiKeyStorageKey: "key_aliyun_api_key",
     providerName: "aliyun",
+    signupUrl: "https://dashscope.aliyuncs.com",
   },
 };
 
@@ -45,6 +49,9 @@ export const MODELS: Record<string, ModelConfig> = {
     requiresStream: true,
     defaultTemperature: 0.7,
   },
+  // ⚠️ 以下模型名称需要在 bianxie 控制台确认是否正确
+  // 已验证可用：gemini-3-flash-preview（outputTokens>0, finishReason=stop）
+  // 未知/可能无效：gemini-3-flash-preview-thinking（outputTokens=0, rawFinishReason=undefined）
   "gemini-3.1-pro-preview": {
     // $1.25 - $10
     displayName: "Ge3.1 Pro",
@@ -95,8 +102,9 @@ export const MODELS: Record<string, ModelConfig> = {
   },
 };
 
+// Fix: MODELS[0] on a Record<string,> is always undefined; use Object.values fallback
 export function getModelConfig(modelName: string): ModelConfig {
-  return MODELS[modelName] || MODELS[0];
+  return MODELS[modelName] ?? Object.values(MODELS)[0];
 }
 
 export function getServerConfig(
@@ -117,7 +125,6 @@ export function createLanguageModel(
   const apiKey = getApiKey(modelConfig.serverType);
 
   if (modelConfig.serverType === "deepseek") {
-    // 使用 @ai-sdk/deepseek provider（它内部也是基于 openai-compatible）
     const deepseek = createDeepSeek({
       baseURL: serverConfig.baseUrl,
       apiKey: apiKey || "sk-placeholder",
@@ -125,7 +132,6 @@ export function createLanguageModel(
     return deepseek(modelName);
   }
 
-  // 其他服务端点统一使用 openai-compatible provider
   const provider = createOpenAICompatible({
     name: serverConfig.providerName,
     baseURL: serverConfig.baseUrl,
@@ -134,10 +140,19 @@ export function createLanguageModel(
   return provider(modelName);
 }
 
-// 存储当前选择的模型
+// 统一的当前模型 localStorage key（ChatInput 不再维护自己的副本）
 export const KEY_CURRENT_MODEL = "key_current_model";
+// 旧版 ChatInput 使用的 key，升级时自动迁移一次
+const KEY_LEGACY_MODEL = "last_used_model";
 
 export function getCurrentModel(): string {
+  // 迁移旧版存储的模型选择（只执行一次）
+  const legacy = localStorage.getItem(KEY_LEGACY_MODEL);
+  if (legacy && MODELS[legacy]) {
+    localStorage.setItem(KEY_CURRENT_MODEL, legacy);
+    localStorage.removeItem(KEY_LEGACY_MODEL);
+    return legacy;
+  }
   return localStorage.getItem(KEY_CURRENT_MODEL) || Object.keys(MODELS)[0];
 }
 

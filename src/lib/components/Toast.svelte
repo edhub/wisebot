@@ -12,7 +12,6 @@
     }
 
     let messageQueue: ToastMessage[] = [];
-
     let cursor = $state<Cursor>({ x: 0, y: 0 });
 
     function calculatePosition() {

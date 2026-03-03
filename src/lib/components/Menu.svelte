@@ -22,9 +22,7 @@
         class="fixed left-0 top-0 w-full h-full bg-gray-900/40 backdrop-blur-[2px] z-[100]"
     >
         <div
-            onclick={(e) => {
-                e.stopPropagation();
-            }}
+            onclick={(e) => e.stopPropagation()}
             transition:slide={{ duration: 200, axis: "x" }}
             class="fixed top-0 left-0 h-full w-80 max-w-[calc(100vw-3rem)] overflow-auto bg-white border-r border-gray-200 z-[101]"
         >

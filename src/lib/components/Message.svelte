@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { parseMarkdown } from "./markdown";
+    import { parseMarkdown } from "$lib/utils/markdown";
     import "highlight.js/styles/github-dark-dimmed.min.css";
-    import type { QandA } from "./ChatStore.svelte";
+    import type { QandA } from "$lib/stores/ChatStore.svelte";
 
     import { fade } from "svelte/transition";
     import { getContext } from "svelte";
@@ -25,44 +25,44 @@
     } = $props();
 
     let isRespOngoing = $derived(qandA.isResponseOngoing ?? false);
-    let questionHtml = $derived(qandA.question);
     let answerHtml = $derived(parseMarkdown(qandA.answer));
 
-    // showActionButtons state removed in favor of CSS group-hover
+    let toast: { show: (msg: string) => void } = getContext("toast");
 
     function handleUrlNavigation(e: Event) {
         if (e.target instanceof HTMLAnchorElement) {
             e.preventDefault();
             const url = (e.target as HTMLAnchorElement).href;
-
             copyToClipboard(url, "已复制链接");
         }
     }
 
-    function copyToClipboard(text: string, toastMsg: string = "已复制") {
-        // Fallback method for iOS Safari and other browsers that do not support navigator.clipboard
-        const textArea = document.createElement("textarea");
-        textArea.value = text;
-        // Make the textarea out of viewport
-        textArea.style.position = "fixed";
-        textArea.style.left = "-9999px";
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-
+    /**
+     * 优先使用现代 Clipboard API，iOS Safari 等不支持时降级到 execCommand。
+     */
+    async function copyToClipboard(text: string, toastMsg: string = "已复制") {
         try {
-            const successful = document.execCommand("copy");
-            const msg = successful ? toastMsg : "复制失败";
-            toast.show(msg);
-        } catch (err) {
-            console.error("Fallback: Oops, unable to copy", err);
-            toast.show("复制失败");
+            await navigator.clipboard.writeText(text);
+            toast.show(toastMsg);
+        } catch {
+            // 降级方案：兼容不支持 navigator.clipboard 的环境
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-9999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand("copy");
+                toast.show(toastMsg);
+            } catch (err) {
+                console.error("Fallback copy failed:", err);
+                toast.show("复制失败");
+            }
+            document.body.removeChild(textArea);
         }
-
-        document.body.removeChild(textArea);
     }
-
-    let toast: { show: (msg: string) => void } = getContext("toast");
 
     function downloadAsMarkdown(qa: QandA) {
         const content = `**问题：** ${qa.question}\n来自 **${qa.botName}** 的回答：\n\n---\n${qa.answer}`;
@@ -92,7 +92,6 @@
         const text = encodeURIComponent(
             `**问题：** ${qandA.question}\n来自 **${qandA.botName}** 的回答：\n\n---\n${qandA.answer}`,
         );
-
         window.open(
             `bear://x-callback-url/create?&tags=${tags}&title=${title}&text=${text}`,
         );
@@ -101,18 +100,15 @@
     function formatTime(ms: number): string {
         return (ms / 1000).toFixed(1);
     }
+
     function formatResponseTimes(
         firstResponseTime?: number,
         completionTime?: number,
     ): string {
         if (!firstResponseTime) return "";
-
         const firstResponse = formatTime(firstResponseTime);
-
         if (!completionTime) return firstResponse + "s";
-
         const completion = formatTime(completionTime);
-
         if (Math.abs(completionTime - firstResponseTime) < 1000)
             return completion + "s";
         else return `${firstResponse} - ${completion}s`;
@@ -143,6 +139,7 @@
 </script>
 
 <div role="article" class="group">
+    <!-- 操作栏 -->
     <div class="flex text-xs text-gray-400">
         <div
             class="h-6 flex-1 flex items-center space-x-3 pl-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:pointer-events-none md:group-hover:pointer-events-auto transition-opacity duration-200"
@@ -158,16 +155,6 @@
             >
                 再次发送
             </button>
-
-            {#if !isRespOngoing}
-                <button
-                    onclick={() => {
-                        onFollowUp?.(qandA);
-                    }}
-                >
-                    追问
-                </button>
-            {/if}
         </div>
         <div class="h-6 flex-1 flex items-center justify-end space-x-3 pr-1">
             <div
@@ -175,22 +162,15 @@
             >
                 <button
                     class="mr-2"
-                    onclick={() => {
-                        deleteQA(qandA);
-                    }}
+                    onclick={() => deleteQA(qandA)}
                 >
                     删除
                 </button>
 
                 {#if !isRespOngoing}
-                    <button
-                        onclick={() => {
-                            downloadAsMarkdown(qandA);
-                        }}
-                    >
+                    <button onclick={() => downloadAsMarkdown(qandA)}>
                         Markdown
                     </button>
-
                     <button onclick={() => createBearNote(qandA)}>
                         Bear
                     </button>
@@ -201,22 +181,22 @@
                 class="p-0 text-lg transition-opacity duration-200 {qandA.favorite
                     ? 'opacity-100'
                     : 'opacity-100 md:opacity-0 md:group-hover:opacity-100'}"
-                onclick={() => {
-                    toggleFavorite(qandA);
-                }}
+                onclick={() => toggleFavorite(qandA)}
             >
                 <span
                     class="{qandA.favorite
                         ? 'text-amber-400'
                         : 'text-gray-400'} font-bold iconify simple-line-icons--star full"
-                >
-                </span>
+                ></span>
             </button>
         </div>
     </div>
+
+    <!-- 消息卡片 -->
     <div class="rounded-lg border-gray-200 border overflow-hidden">
         <div class="bg-gray-50">
             <div class="h-2 bg-gray-300"></div>
+            <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_noninteractive_element_interactions -->
             <article
                 class="prose py-2 px-4 max-w-none text-gray-800"
                 onclick={handleUrlNavigation}
@@ -230,18 +210,15 @@
                         />
                     </div>
                 {/if}
-                {@html questionHtml}
+                {@html qandA.question}
             </article>
             <div class="flex text-xs px-4 items-center">
                 <span class="text-gray-800 font-bold">
                     {qandA.botName}
                 </span>
-
                 {#if isRespOngoing}
-                    <span class="ml-2 text-gray-400">
-                        <span class="text-xs text-gray-400"
-                            >{formatTime(elapsedTime)}s</span
-                        >
+                    <span class="ml-2 text-gray-400 text-xs">
+                        {formatTime(elapsedTime)}s
                     </span>
                 {/if}
                 {#if !isRespOngoing && qandA.firstResponseTime !== undefined}
@@ -255,6 +232,7 @@
             </div>
         </div>
         <hr class="ml-4 w-1/3 border-gray-300" />
+        <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_noninteractive_element_interactions -->
         <article
             class="prose mt-5 pb-2 px-4 max-w-none"
             onclick={handleUrlNavigation}
@@ -268,6 +246,8 @@
             {/if}
         </article>
     </div>
+
+    <!-- 底部追问按钮（唯一入口，位置更贴近内容） -->
     {#if !isRespOngoing && qandA.answer.length > 0}
         <div class="flex justify-end mt-1 pr-1">
             <button
@@ -283,15 +263,9 @@
 
 <style>
     @keyframes blink {
-        0% {
-            opacity: 1;
-        }
-        50% {
-            opacity: 0.2;
-        }
-        100% {
-            opacity: 1;
-        }
+        0% { opacity: 1; }
+        50% { opacity: 0.2; }
+        100% { opacity: 1; }
     }
 
     .blink {

@@ -5,7 +5,9 @@
         deleteQA,
         toggleFavorite,
         type QandA,
-    } from "./ChatStore.svelte";
+    } from "$lib/stores/ChatStore.svelte";
+    // KaTeX CSS 从 npm 包引入，支持离线 PWA，不依赖外部 CDN
+    import "katex/dist/katex.min.css";
 
     let { resendMessage, onFollowUp } = $props<{
         resendMessage: (msg: string, image?: string, imageUrl?: string) => void;
@@ -14,15 +16,6 @@
 
     let chatContainer: HTMLDivElement;
 </script>
-
-<svelte:head>
-    <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css"
-        integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71HotJqlAn"
-        crossorigin="anonymous"
-    />
-</svelte:head>
 
 <div bind:this={chatContainer} class="flex flex-col gap-2 pb-32">
     {#each chatState.chatLog as qa (qa.id)}

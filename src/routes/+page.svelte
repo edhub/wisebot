@@ -1,11 +1,11 @@
 <script lang="ts">
-    import { tick } from "svelte";
+    import { tick, onMount } from "svelte";
     import { fade } from "svelte/transition";
-    import { query } from "./query_api";
-    import ChatContainer from "./ChatContainer.svelte";
-    import ChatInput from "./ChatInput.svelte";
-    import Menu from "./Menu.svelte";
-    import Sidebar from "./Sidebar.svelte";
+    import { query } from "$lib/config/query_api";
+    import ChatContainer from "$lib/components/ChatContainer.svelte";
+    import ChatInput from "$lib/components/ChatInput.svelte";
+    import Menu from "$lib/components/Menu.svelte";
+    import Sidebar from "$lib/components/Sidebar.svelte";
     import {
         chatState,
         generateId,
@@ -14,16 +14,16 @@
         openConfirm,
         initChatStore,
         type QandA,
-    } from "./ChatStore.svelte";
-    import { MODELS } from "./model_config";
-    import ConfirmDialog from "./ConfirmDialog.svelte";
+    } from "$lib/stores/ChatStore.svelte";
+    import { MODELS, setCurrentModel } from "$lib/config/model_config";
+    import ConfirmDialog from "$lib/components/ConfirmDialog.svelte";
 
     let showMenu = $state(false);
     let showSidebar = $state(false);
     let activeId = $state<string | null>(null);
     let chatInput = $state<ChatInput>();
 
-    // Selection follow-up state
+    // 选中文字追问状态
     let selectionInfo = $state<{
         text: string;
         x: number;
@@ -31,17 +31,20 @@
         qaId: string;
     } | null>(null);
     let scrollContainer = $state<HTMLDivElement | null>(null);
-    let isScrolled = $state(true);
+
+    // 输入框展开/收起状态（替代原来含义不清晰的 isScrolled）
+    let isInputExpanded = $state(false);
     let ignoreScroll = false;
 
-    $effect(() => {
+    // 用 onMount 做一次性初始化，语义比 $effect 更清晰
+    onMount(() => {
         initChatStore();
     });
 
     function handleScroll() {
         if (!scrollContainer || ignoreScroll) return;
         if (scrollContainer.scrollTop > 50) {
-            isScrolled = true;
+            isInputExpanded = false; // 滚动时自动收起输入框
         }
         if (selectionInfo) selectionInfo = null;
     }
@@ -55,7 +58,7 @@
     ) {
         if (message.trim() === "" && !imageUrl) return;
 
-        isScrolled = true;
+        isInputExpanded = false; // 发送后收起输入框，让用户看到响应
         const startTime = Date.now();
 
         const rawQA: QandA = {
@@ -77,14 +80,11 @@
 
         await tick();
 
-        // Scroll to the new message
         const el = document.getElementById(`qa-${newQA.id}`);
         if (el) {
             el.scrollIntoView({ behavior: "smooth", block: "start" });
         }
 
-        // If image is a storage ID (from saveImage), we need to get its actual content/url for query
-        // But for now, image holds the ID and imageUrl holds the data/blob URL
         const deltaReader = query(
             model,
             message,
@@ -113,9 +113,10 @@
             if (buffer.length > 0) {
                 newQA.answer += buffer;
             }
-        } catch (e: any) {
+        } catch (e: unknown) {
             console.error(`[handleSendMessage] Error:`, e);
-            newQA.answer += `\n\n[连接异常: ${e.message || "未知错误"}]`;
+            const err = e as Error;
+            newQA.answer += `\n\n[连接异常: ${err.message || "未知错误"}]`;
         } finally {
             if (newQA.answer.length === 0) {
                 newQA.firstResponseTime = Date.now() - startTime;
@@ -148,14 +149,12 @@
 
     function expandInput(text?: string, qa?: QandA, image?: string) {
         ignoreScroll = true;
-        isScrolled = false;
+        isInputExpanded = true;
 
         if (scrollContainer) {
-            // 立即锁定滚动以切断移动端的惯性
             scrollContainer.style.overflow = "hidden";
             setTimeout(() => {
                 if (scrollContainer) scrollContainer.style.overflow = "auto";
-                // 500ms 内屏蔽滚动回调，防止剩余惯性将输入框再次"压"回去
                 setTimeout(() => {
                     ignoreScroll = false;
                 }, 500);
@@ -163,7 +162,7 @@
         } else {
             ignoreScroll = false;
         }
-        // 使用 tick 确保在 DOM 状态切换后执行聚焦
+
         tick().then(() => {
             if (text !== undefined || qa !== undefined || image !== undefined) {
                 chatInput?.setQuestion(text ?? "", qa, image);
@@ -171,7 +170,6 @@
             const el = document.getElementById("chat-input");
             if (el) {
                 el.focus();
-                // 某些移动浏览器需要手动 click 或再次 focus 来唤起键盘
                 (el as HTMLTextAreaElement).click();
             }
         });
@@ -210,8 +208,6 @@
             });
         };
 
-        // 当消息列表结构变化时重新同步观察目标。
-        // Svelte 5 会自动追踪 chatState.chatLog 的依赖。
         chatState.chatLog;
         tick().then(refresh);
 
@@ -225,7 +221,6 @@
 
     function handleMouseUp(e: MouseEvent) {
         if (mouseUpTimeout) clearTimeout(mouseUpTimeout);
-        // Small delay to ensure selection state is updated
         mouseUpTimeout = window.setTimeout(() => {
             const selection = window.getSelection();
             if (
@@ -282,9 +277,28 @@
 
     $effect(() => {
         const quickInputListener = (e: KeyboardEvent) => {
+            // ⌘K：全局展开输入框
             if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
                 e.preventDefault();
                 expandInput();
+                return;
+            }
+            // ⌘1-N：全局切换模型（不发送）
+            // 当输入框已展开且 textarea 聚焦时，由 ChatInput 内部的 onkeydown 优先处理
+            if (e.metaKey && !e.shiftKey && !e.altKey && !e.ctrlKey) {
+                const num = parseInt(e.key);
+                const models = Object.keys(MODELS);
+                if (num >= 1 && num <= models.length) {
+                    // 仅当输入框未展开（textarea 未聚焦）时，全局监听器切换模型
+                    const focused = document.activeElement;
+                    const isTextareaFocused =
+                        focused instanceof HTMLTextAreaElement ||
+                        focused instanceof HTMLInputElement;
+                    if (!isTextareaFocused) {
+                        e.preventDefault();
+                        setCurrentModel(models[num - 1]);
+                    }
+                }
             }
         };
         window.addEventListener("keydown", quickInputListener);
@@ -322,7 +336,7 @@
         ></div>
     {/if}
 
-    <!-- Mobile Header Toggle (Fixed to avoid stacking context issues) -->
+    <!-- 移动端悬浮按钮 -->
     {#if !showSidebar}
         <div
             class="md:hidden fixed bottom-6 left-4 z-[65] flex gap-2"
@@ -350,11 +364,11 @@
     <!-- 右侧：问答详情 -->
     <main class="flex-1 flex flex-col relative min-w-0 h-full bg-white">
         <!-- 展开时的输入框覆盖层 -->
-        {#if !isScrolled}
+        {#if isInputExpanded}
             <div
                 class="fixed inset-0 z-[80] flex items-start justify-center pt-12 md:pt-20 px-4 md:px-6 bg-gray-900/5 backdrop-blur-[2px]"
                 transition:fade={{ duration: 200 }}
-                onclick={() => (isScrolled = true)}
+                onclick={() => (isInputExpanded = false)}
             >
                 <div
                     class="w-full max-w-4xl"
@@ -366,7 +380,7 @@
                         <ChatInput
                             bind:this={chatInput}
                             onSendMessage={handleSendMessage}
-                            onEscape={() => (isScrolled = true)}
+                            onEscape={() => (isInputExpanded = false)}
                         />
                     </div>
                     <div class="flex justify-between items-center px-2 mt-3">
@@ -396,7 +410,7 @@
             </div>
         </div>
 
-        <!-- Floating Selection Follow-up Button -->
+        <!-- 选中文字追问浮动按钮 -->
         {#if selectionInfo}
             <div
                 class="fixed z-[75] -translate-x-1/2 -translate-y-full pb-2 pointer-events-auto selection-btn"
@@ -414,8 +428,8 @@
             </div>
         {/if}
 
-        <!-- 缩小后的浮动按钮 (移动到右下角) -->
-        {#if isScrolled}
+        <!-- 收起状态下的新建问题浮动按钮 -->
+        {#if !isInputExpanded}
             <div
                 class="fixed bottom-8 right-8 z-[65]"
                 transition:fade={{ duration: 200 }}

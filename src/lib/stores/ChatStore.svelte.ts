@@ -13,7 +13,7 @@ export interface QandA {
   completionTime?: number;
   isResponseOngoing?: boolean;
   image?: string; // 存储在 IDB 中的图片 ID
-  imageUrl?: string; // 运行时使用的 Blob URL
+  imageUrl?: string; // 运行时使用的 Blob URL 或 Base64 Data URL
   createTime: number;
 }
 
@@ -24,26 +24,40 @@ export function generateId(): string {
   return Math.random().toString(36).substring(2, 9);
 }
 
+// 预构建 parentId → children 的映射，O(n) 复杂度
+function buildChildrenMap(messages: QandA[]): Map<string | undefined, QandA[]> {
+  const map = new Map<string | undefined, QandA[]>();
+  for (const m of messages) {
+    const key = m.parentId;
+    if (!map.has(key)) map.set(key, []);
+    map.get(key)!.push(m);
+  }
+  return map;
+}
+
 // 使用 Svelte 5 Runes 管理全局状态
 export const chatState = $state({
   messages: [] as QandA[],
 
-  // 派生状态：按树状结构排序的消息列表
+  // 派生状态：按树状结构排序的消息列表（O(n) 复杂度）
   get chatLog() {
     const msgs = this.messages;
+
+    // 一次遍历构建映射，避免 O(n²) 的 filter
+    const childrenMap = buildChildrenMap(msgs);
+
+    // 对每个分桶排序：顶层按时间倒序，子节点按时间正序
+    childrenMap.forEach((children, key) => {
+      children.sort((a, b) =>
+        key === undefined
+          ? b.createTime - a.createTime
+          : a.createTime - b.createTime,
+      );
+    });
+
     const result: QandA[] = [];
-
     const walk = (parentId?: string) => {
-      const children = msgs
-        .filter((m) => {
-          if (!parentId) return !m.parentId;
-          return m.parentId === parentId;
-        })
-        .sort((a, b) => {
-          if (!parentId) return b.createTime - a.createTime;
-          return a.createTime - b.createTime;
-        });
-
+      const children = childrenMap.get(parentId) ?? [];
       for (const child of children) {
         result.push(child);
         walk(child.id);
@@ -52,6 +66,7 @@ export const chatState = $state({
 
     walk();
 
+    // 兜底：将游离节点（parentId 指向不存在的节点）追加到末尾
     if (result.length < msgs.length) {
       const resultIds = new Set(result.map((m) => m.id));
       msgs.forEach((m) => {
@@ -87,7 +102,6 @@ export async function initChatStore() {
     if (legacy) {
       try {
         messages = JSON.parse(legacy);
-        // 迁移成功后可以考虑清理旧数据，但保守起见先保留
         await set(KEY_CHAT_LOG_IDB, messages);
       } catch (e) {
         console.error("Migration from localStorage failed", e);
@@ -148,7 +162,7 @@ export function openConfirm(
  */
 
 export async function saveImage(id: string, data: string | Blob) {
-  let toStore: any = data;
+  let toStore: Blob | string = data;
   if (typeof data === "string" && data.startsWith("data:")) {
     const res = await fetch(data);
     toStore = await res.blob();
@@ -162,7 +176,8 @@ export function addMessage(qa: QandA) {
   saveChatLog();
 }
 
-export function deleteQA(qa: QandA) {
+// 内部实现：执行删除逻辑但不保存，用于批量操作
+function _removeQA(qa: QandA) {
   if (qa.image) {
     del(`img_${qa.image}`).catch(console.error);
     if (qa.imageUrl?.startsWith("blob:")) {
@@ -176,6 +191,7 @@ export function deleteQA(qa: QandA) {
     .filter((m) => m.parentId === qa.id)
     .sort((a, b) => a.createTime - b.createTime);
 
+  // 子节点提升：继承被删节点的 parentId
   children.forEach((child, index) => {
     child.parentId = targetParentId;
     if (!targetParentId) {
@@ -186,6 +202,10 @@ export function deleteQA(qa: QandA) {
   });
 
   chatState.messages = chatState.messages.filter((m) => m.id !== qa.id);
+}
+
+export function deleteQA(qa: QandA) {
+  _removeQA(qa);
   saveChatLog();
 }
 
@@ -208,7 +228,6 @@ export function toggleFoldAll(folded: boolean) {
 
 export function clearAllMessages() {
   openConfirm("清空所有", "确定要清空所有对话吗？", () => {
-    // 同时清理所有关联图片
     chatState.messages.forEach((qa) => {
       if (qa.image) del(`img_${qa.image}`);
       if (qa.imageUrl?.startsWith("blob:")) URL.revokeObjectURL(qa.imageUrl);
@@ -219,6 +238,7 @@ export function clearAllMessages() {
 }
 
 export function deleteGroup(roots: QandA[]) {
+  // 收集整个子树的所有节点 ID
   const groupMessageIds = new Set<string>();
   const stack = [...roots.map((r) => r.id)];
   while (stack.length > 0) {
@@ -235,10 +255,13 @@ export function deleteGroup(roots: QandA[]) {
 
   if (toDelete.length === 0) return;
 
-  toDelete.forEach((m) => {
+  // 批量删除：逐个执行但不触发保存，最后统一保存一次
+  for (const m of toDelete) {
     const current = chatState.messages.find((item) => item.id === m.id);
     if (current) {
-      deleteQA(current);
+      _removeQA(current); // 不调用 saveChatLog
     }
-  });
+  }
+
+  saveChatLog(); // 只保存一次
 }

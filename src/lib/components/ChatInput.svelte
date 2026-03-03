@@ -1,8 +1,8 @@
 <script lang="ts">
     import { tick } from "svelte";
-    import { MODELS } from "./model_config";
-    import type { QandA } from "./ChatStore.svelte";
-    const KEY_LAST_MODEL = "last_used_model";
+    import { MODELS, getCurrentModel, setCurrentModel } from "$lib/config/model_config";
+    import type { QandA } from "$lib/stores/ChatStore.svelte";
+    import { saveImage, generateId } from "$lib/stores/ChatStore.svelte";
 
     let { onSendMessage, onEscape } = $props<{
         onSendMessage: (
@@ -22,22 +22,21 @@
     let lastQA = $state<QandA | undefined>(undefined);
 
     const availableModels = Object.keys(MODELS);
-    let lastModel = $state(
-        localStorage.getItem(KEY_LAST_MODEL) || availableModels[0],
-    );
+
+    // 统一使用 model_config 中的 getCurrentModel/setCurrentModel，
+    // 不再维护独立的 KEY_LAST_MODEL，避免两套 localStorage key 不同步
+    let lastModel = $state(getCurrentModel());
 
     function saveLastModel(model: string) {
         lastModel = model;
-        localStorage.setItem(KEY_LAST_MODEL, model);
+        setCurrentModel(model);
     }
-
-    import { saveImage, generateId } from "./ChatStore.svelte";
 
     async function resizeTextarea() {
         await tick();
         textarea.style.height = "auto";
-        let maxHeight = window.innerHeight * 0.5;
-        let desiredHeight = Math.min(textarea.scrollHeight, maxHeight);
+        const maxHeight = window.innerHeight * 0.5;
+        const desiredHeight = Math.min(textarea.scrollHeight, maxHeight);
         textarea.style.height = desiredHeight + "px";
     }
 
@@ -50,7 +49,6 @@
             if (imageBase64) {
                 imageId = generateId();
                 await saveImage(imageId, imageBase64);
-                // Create a temporary object URL for immediate display
                 imageUrl = imageBase64;
             }
 
@@ -64,21 +62,20 @@
     }
 
     function handleKeyDown(e: KeyboardEvent) {
-        // 处理 Esc 收起输入框
         if (e.key === "Escape") {
             e.preventDefault();
             onEscape?.();
             return;
         }
 
-        // 处理 Enter 发送消息
         if (e.key === "Enter" && e.keyCode === 13 && !e.altKey && !e.shiftKey) {
             e.preventDefault();
             handleSendMessage(lastModel);
             return;
         }
 
-        // 处理 CMD+数字 选择模型
+        // CMD+数字 快捷选模型并发送（仅在 textarea 聚焦时处理）
+        // 全局的 CMD+数字（不发送，只切换）由 +page.svelte 统一监听
         if (e.metaKey && !e.shiftKey && !e.altKey && !e.ctrlKey) {
             const num = parseInt(e.key);
             if (num >= 1 && num <= availableModels.length) {
@@ -96,13 +93,10 @@
     function handlePaste(e: ClipboardEvent) {
         const items = e.clipboardData?.items;
         if (!items) return;
-
         for (const item of items) {
             if (item.type.indexOf("image") !== -1) {
                 const file = item.getAsFile();
-                if (file) {
-                    processFile(file);
-                }
+                if (file) processFile(file);
             }
         }
     }
@@ -122,28 +116,8 @@
         reader.readAsDataURL(file);
     }
 
-    $effect(() => {
-        // 添加全局快捷键监听
-        const globalShortcutListener = (e: KeyboardEvent) => {
-            if (e.metaKey && !e.shiftKey && !e.altKey && !e.ctrlKey) {
-                const num = parseInt(e.key);
-                if (num >= 1 && num <= availableModels.length) {
-                    e.preventDefault();
-                    saveLastModel(availableModels[num - 1]);
-                }
-            }
-        };
-
-        window.addEventListener("keydown", globalShortcutListener);
-        return () =>
-            window.removeEventListener("keydown", globalShortcutListener);
-    });
-
     export function setQuestion(text: string, qa?: QandA, image?: string) {
         question = text;
-        // If image is an ID from IndexedDB, we'd need to fetch it,
-        // but for 'resend' we can use the existing imageUrl if available.
-        // For simplicity in this UI, we'll try to use the imageUrl from the QA object via the caller.
         imageBase64 = image;
         textarea.focus();
         resizeTextarea();
@@ -152,14 +126,9 @@
 
     function formatLastQA(qa?: QandA) {
         if (!qa) return "";
-        if (qa.answer.length > 100) {
-            return qa.answer.substring(0, 100) + "...";
-        }
-        return qa.answer;
-    }
-
-    function clearLastQA() {
-        lastQA = undefined;
+        return qa.answer.length > 100
+            ? qa.answer.substring(0, 100) + "..."
+            : qa.answer;
     }
 </script>
 
@@ -192,7 +161,7 @@
                 <button
                     type="button"
                     class="ml-2 px-2 py-1 text-xs text-gray-500 hover:text-gray-700 touch-manipulation"
-                    onclick={() => clearLastQA()}
+                    onclick={() => (lastQA = undefined)}
                 >
                     ✕
                 </button>
@@ -248,9 +217,7 @@
                     model
                         ? 'bg-gray-200 font-bold'
                         : 'bg-gray-100 hover:bg-gray-200'}"
-                    onclick={() => {
-                        handleSendMessage(model);
-                    }}
+                    onclick={() => handleSendMessage(model)}
                 >
                     ⌘{i + 1}
                     {MODELS[model].displayName}

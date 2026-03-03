@@ -1,22 +1,11 @@
 <script lang="ts">
     import InplaceEdit from "./InplaceEdit.svelte";
-    import { getApiKey, setApiKey } from "./model_config";
+    import { getApiKey, setApiKey } from "$lib/config/model_config";
 
+    // 仅用于展示，持久化由 onchange 驱动（不再用 $effect 做初始化冗余写入）
     let deepseekApiKey = $state(getApiKey("deepseek"));
     let bianxieApiKey = $state(getApiKey("bianxie"));
     let aliyunApiKey = $state(getApiKey("aliyun"));
-
-    $effect(() => {
-        setApiKey("deepseek", deepseekApiKey);
-    });
-
-    $effect(() => {
-        setApiKey("bianxie", bianxieApiKey);
-    });
-
-    $effect(() => {
-        setApiKey("aliyun", aliyunApiKey);
-    });
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -33,7 +22,10 @@
             onclick={(e) => e.stopPropagation()}
             class="rounded-xl bg-gray-200 p-2 overflow-clip"
         >
-            <InplaceEdit bind:value={bianxieApiKey} />
+            <InplaceEdit
+                bind:value={bianxieApiKey}
+                onchange={(v) => setApiKey("bianxie", v)}
+            />
         </div>
     </div>
 
@@ -43,7 +35,10 @@
             onclick={(e) => e.stopPropagation()}
             class="rounded-xl bg-gray-200 p-2 overflow-clip"
         >
-            <InplaceEdit bind:value={aliyunApiKey} />
+            <InplaceEdit
+                bind:value={aliyunApiKey}
+                onchange={(v) => setApiKey("aliyun", v)}
+            />
         </div>
     </div>
 
@@ -53,7 +48,10 @@
             onclick={(e) => e.stopPropagation()}
             class="rounded-xl bg-gray-200 p-2 overflow-clip"
         >
-            <InplaceEdit bind:value={deepseekApiKey} />
+            <InplaceEdit
+                bind:value={deepseekApiKey}
+                onchange={(v) => setApiKey("deepseek", v)}
+            />
         </div>
     </div>
 </div>
