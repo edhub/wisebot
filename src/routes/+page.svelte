@@ -1,22 +1,22 @@
 <script lang="ts">
     import { tick, onMount } from "svelte";
     import { fade } from "svelte/transition";
-    import { query } from "$lib/config/query_api";
-    import ChatContainer from "$lib/components/ChatContainer.svelte";
-    import ChatInput from "$lib/components/ChatInput.svelte";
-    import Menu from "$lib/components/Menu.svelte";
-    import Sidebar from "$lib/components/Sidebar.svelte";
+    import { query } from "$lib/chat/query_api";
+    import ChatContainer from "$lib/chat/ChatContainer.svelte";
+    import ChatInput from "$lib/chat/ChatInput.svelte";
+    import Menu from "$lib/settings/Menu.svelte";
+    import Sidebar from "$lib/sidebar/Sidebar.svelte";
     import {
         chatState,
         generateId,
         saveChatLog,
         addMessage,
-        openConfirm,
         initChatStore,
         type QandA,
-    } from "$lib/stores/ChatStore.svelte";
-    import { MODELS, setCurrentModel } from "$lib/config/model_config";
-    import ConfirmDialog from "$lib/components/ConfirmDialog.svelte";
+    } from "$lib/chat/ChatStore.svelte";
+    import { openConfirm } from "$lib/shared/confirm.svelte";
+    import { MODELS, setCurrentModel } from "$lib/settings/model_config";
+    import ConfirmDialog from "$lib/shared/ConfirmDialog.svelte";
 
     let showMenu = $state(false);
     let showSidebar = $state(false);

@@ -1,6 +1,6 @@
 <script lang="ts">
-    import InplaceEdit from "./InplaceEdit.svelte";
-    import { getApiKey, setApiKey } from "$lib/config/model_config";
+    import InplaceEdit from "$lib/shared/InplaceEdit.svelte";
+    import { getApiKey, setApiKey } from "./model_config";
 
     // 仅用于展示，持久化由 onchange 驱动（不再用 $effect 做初始化冗余写入）
     let deepseekApiKey = $state(getApiKey("deepseek"));

@@ -1,8 +1,8 @@
 <script lang="ts">
     import { tick } from "svelte";
-    import { MODELS, getCurrentModel, setCurrentModel } from "$lib/config/model_config";
-    import type { QandA } from "$lib/stores/ChatStore.svelte";
-    import { saveImage, generateId } from "$lib/stores/ChatStore.svelte";
+    import { MODELS, getCurrentModel, setCurrentModel } from "$lib/settings/model_config";
+    import type { QandA } from "./ChatStore.svelte";
+    import { saveImage, generateId } from "./ChatStore.svelte";
 
     let { onSendMessage, onEscape } = $props<{
         onSendMessage: (

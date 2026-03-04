@@ -3,9 +3,9 @@
         chatState,
         toggleFavorite,
         deleteGroup,
-        openConfirm,
         type QandA,
-    } from "$lib/stores/ChatStore.svelte";
+    } from "$lib/chat/ChatStore.svelte";
+    import { openConfirm } from "$lib/shared/confirm.svelte";
     import { slide } from "svelte/transition";
     import { getContext } from "svelte";
 

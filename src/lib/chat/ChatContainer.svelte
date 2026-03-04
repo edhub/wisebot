@@ -5,7 +5,7 @@
         deleteQA,
         toggleFavorite,
         type QandA,
-    } from "$lib/stores/ChatStore.svelte";
+    } from "./ChatStore.svelte";
     // KaTeX CSS 从 npm 包引入，支持离线 PWA，不依赖外部 CDN
     import "katex/dist/katex.min.css";
 

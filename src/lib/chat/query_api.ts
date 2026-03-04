@@ -1,7 +1,7 @@
 import type { ModelMessage } from "ai";
 import { streamText, APICallError } from "ai";
-import type { QandA } from "$lib/stores/ChatStore.svelte";
-import { getModelConfig, getApiKey, createLanguageModel, SERVERS } from "./model_config";
+import type { QandA } from "./ChatStore.svelte";
+import { getModelConfig, getApiKey, createLanguageModel, SERVERS } from "$lib/settings/model_config";
 
 // ─── 错误提取 ──────────────────────────────────────────────────────────────────
 

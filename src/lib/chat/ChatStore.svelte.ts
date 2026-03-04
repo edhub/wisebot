@@ -1,4 +1,5 @@
 import { get, set, del } from "idb-keyval";
+import { openConfirm } from "$lib/shared/confirm.svelte";
 
 export interface QandA {
   id: string;
@@ -134,27 +135,6 @@ export async function saveChatLog() {
   // 存储到 IDB 时不持久化运行时生成的 imageUrl
   const toSave = chatState.messages.map(({ imageUrl, ...rest }) => rest);
   await set(KEY_CHAT_LOG_IDB, toSave);
-}
-
-export const confirmState = $state({
-  show: false,
-  title: "",
-  message: "",
-  onConfirm: () => {},
-});
-
-export function openConfirm(
-  title: string,
-  message: string,
-  onConfirm: () => void,
-) {
-  confirmState.title = title;
-  confirmState.message = message;
-  confirmState.onConfirm = () => {
-    onConfirm();
-    confirmState.show = false;
-  };
-  confirmState.show = true;
 }
 
 /**

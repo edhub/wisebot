@@ -1,6 +1,6 @@
 <script lang="ts">
     import { fade, scale } from "svelte/transition";
-    import { confirmState } from "$lib/stores/ChatStore.svelte";
+    import { confirmState } from "./confirm.svelte";
 
     function handleCancel() {
         confirmState.show = false;

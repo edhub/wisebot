@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { parseMarkdown } from "$lib/utils/markdown";
+    import { parseMarkdown } from "./markdown";
     import "highlight.js/styles/github-dark-dimmed.min.css";
-    import type { QandA } from "$lib/stores/ChatStore.svelte";
+    import type { QandA } from "./ChatStore.svelte";
 
     import { fade } from "svelte/transition";
     import { getContext } from "svelte";
