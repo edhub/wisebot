@@ -10,7 +10,7 @@
     import "katex/dist/katex.min.css";
 
     let { resendMessage, onFollowUp } = $props<{
-        resendMessage: (msg: string, image?: string, imageUrl?: string) => void;
+        resendMessage: (qa: QandA) => void;
         onFollowUp: (qa: QandA) => void;
     }>();
 
@@ -25,8 +25,7 @@
         >
             <Message
                 qandA={qa}
-                onResendMessage={(msg) =>
-                    resendMessage(msg, qa.image, qa.imageUrl)}
+                onResendMessage={(qa) => resendMessage(qa)}
                 {deleteQA}
                 {toggleFavorite}
                 {onFollowUp}

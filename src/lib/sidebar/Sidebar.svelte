@@ -68,7 +68,13 @@
     function scrollToMessage(id: string) {
         const el = document.getElementById(`qa-${id}`);
         if (el) {
-            el.scrollIntoView({ behavior: "smooth", block: "start" });
+            const container = el.closest(".overflow-y-auto") ?? document.documentElement;
+            const offset = 24; // 顶部留白 px
+            const top = el.getBoundingClientRect().top
+                - container.getBoundingClientRect().top
+                + (container as HTMLElement).scrollTop
+                - offset;
+            (container as HTMLElement).scrollTo({ top, behavior: "smooth" });
         }
         onSelect?.();
     }

@@ -14,11 +14,7 @@
         onFollowUp,
     }: {
         qandA: QandA;
-        onResendMessage?: (
-            message: string,
-            image?: string,
-            imageUrl?: string,
-        ) => void;
+        onResendMessage?: (qa: QandA) => void;
         deleteQA: (qa: QandA) => void;
         toggleFavorite: (qa: QandA) => void;
         onFollowUp?: (qa: QandA) => void;
@@ -140,45 +136,74 @@
 
 <div role="article" class="group">
     <!-- 操作栏 -->
-    <div class="flex text-xs text-gray-400">
+    <div class="flex text-gray-400 items-center pl-1 pr-1 h-7">
+        <!-- 左侧：常用操作（图标按钮） -->
         <div
-            class="h-6 flex-1 flex items-center space-x-3 pl-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:pointer-events-none md:group-hover:pointer-events-auto transition-opacity duration-200"
+            class="flex items-center gap-3 flex-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:pointer-events-none md:group-hover:pointer-events-auto transition-opacity duration-200"
         >
             <button
-                onclick={() => {
-                    onResendMessage?.(
-                        qandA.question,
-                        qandA.image,
-                        qandA.imageUrl,
-                    );
-                }}
+                class="p-1 text-base hover:text-gray-600 active:scale-90 transition-all touch-manipulation"
+                title="再次发送"
+                onclick={() => onResendMessage?.(qandA)}
             >
-                再次发送
+                <span class="iconify simple-line-icons--reload"></span>
             </button>
+            <button
+                class="p-1 text-base hover:text-gray-600 active:scale-90 transition-all touch-manipulation"
+                title="复制问题"
+                onclick={() => copyToClipboard(qandA.question, "问题已复制")}
+            >
+                <span class="iconify simple-line-icons--docs"></span>
+            </button>
+            {#if !isRespOngoing && qandA.answer.length > 0}
+                <button
+                    class="p-1 text-base hover:text-gray-600 active:scale-90 transition-all touch-manipulation"
+                    title="复制回复"
+                    onclick={() => copyToClipboard(qandA.answer, "回复已复制")}
+                >
+                    <span class="iconify simple-line-icons--doc"></span>
+                </button>
+                <button
+                    class="p-1 text-base hover:text-gray-600 active:scale-90 transition-all touch-manipulation"
+                    title="追问"
+                    onclick={() => onFollowUp?.(qandA)}
+                >
+                    <span class="iconify simple-line-icons--bubble"></span>
+                </button>
+            {/if}
         </div>
-        <div class="h-6 flex-1 flex items-center justify-end space-x-3 pr-1">
+        <!-- 右侧：次要操作 -->
+        <div class="flex items-center gap-3">
             <div
-                class="flex items-center space-x-3 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:pointer-events-none md:group-hover:pointer-events-auto transition-opacity duration-200"
+                class="flex items-center gap-3 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:pointer-events-none md:group-hover:pointer-events-auto transition-opacity duration-200"
             >
                 <button
-                    class="mr-2"
+                    class="p-1 text-base hover:text-red-400 active:scale-90 transition-all touch-manipulation"
+                    title="删除"
                     onclick={() => deleteQA(qandA)}
                 >
-                    删除
+                    <span class="iconify simple-line-icons--trash"></span>
                 </button>
-
                 {#if !isRespOngoing}
-                    <button onclick={() => downloadAsMarkdown(qandA)}>
-                        Markdown
+                    <button
+                        class="p-1 text-base hover:text-gray-600 active:scale-90 transition-all touch-manipulation"
+                        title="下载 Markdown"
+                        onclick={() => downloadAsMarkdown(qandA)}
+                    >
+                        <span class="iconify simple-line-icons--cloud-download"></span>
                     </button>
-                    <button onclick={() => createBearNote(qandA)}>
-                        Bear
+                    <button
+                        class="p-1 text-base hover:text-gray-600 active:scale-90 transition-all touch-manipulation"
+                        title="存入 Bear"
+                        onclick={() => createBearNote(qandA)}
+                    >
+                        <span class="iconify simple-line-icons--note"></span>
                     </button>
                 {/if}
             </div>
             <!-- svelte-ignore a11y_consider_explicit_label -->
             <button
-                class="p-0 text-lg transition-opacity duration-200 {qandA.favorite
+                class="p-1 text-base transition-opacity duration-200 {qandA.favorite
                     ? 'opacity-100'
                     : 'opacity-100 md:opacity-0 md:group-hover:opacity-100'}"
                 onclick={() => toggleFavorite(qandA)}
@@ -186,7 +211,7 @@
                 <span
                     class="{qandA.favorite
                         ? 'text-amber-400'
-                        : 'text-gray-400'} font-bold iconify simple-line-icons--star full"
+                        : 'text-gray-400'} iconify simple-line-icons--star"
                 ></span>
             </button>
         </div>

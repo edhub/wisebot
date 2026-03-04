@@ -135,12 +135,11 @@
         });
     }
 
-    function handleResendMessage(
-        message: string,
-        image?: string,
-        imageUrl?: string,
-    ) {
-        expandInput(message, undefined, imageUrl || image);
+    function handleResendMessage(qa: QandA) {
+        const parentQA = qa.parentId
+            ? chatState.messages.find((m) => m.id === qa.parentId)
+            : undefined;
+        expandInput(qa.question, parentQA, qa.imageUrl || qa.image);
     }
 
     function handleFollowUp(qa: QandA) {
@@ -403,8 +402,7 @@
         >
             <div class="max-w-5xl mx-auto w-full px-4 md:px-2 pb-8">
                 <ChatContainer
-                    resendMessage={(msg, img, imgUrl) =>
-                        handleResendMessage(msg, img, imgUrl)}
+                    resendMessage={(qa) => handleResendMessage(qa)}
                     onFollowUp={handleFollowUp}
                 />
             </div>
