@@ -39,6 +39,7 @@ function buildChildrenMap(messages: QandA[]): Map<string | undefined, QandA[]> {
 // 使用 Svelte 5 Runes 管理全局状态
 export const chatState = $state({
   messages: [] as QandA[],
+  isLoading: true,
 
   // 派生状态：按树状结构排序的消息列表（O(n) 复杂度）
   get chatLog() {
@@ -128,6 +129,7 @@ export async function initChatStore() {
   }
 
   chatState.messages = messages;
+  chatState.isLoading = false;
 }
 
 export async function saveChatLog() {

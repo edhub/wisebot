@@ -188,7 +188,8 @@ export async function* query(
             yield "> 思考中...\n>\n> ";
           }
           hasYieldedContent = true;
-          yield part.text.replace(/\n/g, "\n> ");
+          // 过滤 UTF-8 替换字符（U+FFFD），它们是网络 chunk 截断多字节字符的产物
+          yield part.text.replace(/\uFFFD/g, "").replace(/\n/g, "\n> ");
           break;
         }
 
@@ -198,7 +199,8 @@ export async function* query(
             hasReasoningContent = false;
           }
           hasYieldedContent = true;
-          yield part.text;
+          // 过滤 UTF-8 替换字符（U+FFFD），它们是网络 chunk 截断多字节字符的产物
+          yield part.text.replace(/\uFFFD/g, "");
           break;
         }
 

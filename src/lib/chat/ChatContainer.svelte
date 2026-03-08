@@ -32,21 +32,34 @@
             />
         </div>
     {:else}
-        <div
-            class="flex flex-col items-center justify-center py-20 text-gray-300"
-        >
+        {#if chatState.isLoading}
             <div
-                class="w-16 h-16 rounded-3xl bg-gray-50 flex items-center justify-center mb-4"
+                class="flex flex-col items-center justify-center py-20 text-gray-300"
             >
-                <span
-                    class="iconify simple-line-icons--pencil text-2xl opacity-20"
-                ></span>
+                <div
+                    class="w-8 h-8 rounded-full border-2 border-gray-200 border-t-gray-400 animate-spin mb-4"
+                ></div>
+                <p class="text-sm text-gray-400">加载中…</p>
             </div>
-            <p class="text-sm font-medium text-gray-400">
-                在此开启你的第一个问题
-            </p>
-            <p class="text-xs text-gray-300 mt-1">直接在下方输入框提问即可</p>
-        </div>
+        {:else}
+            <div
+                class="flex flex-col items-center justify-center py-20 text-gray-300"
+            >
+                <div
+                    class="w-16 h-16 rounded-3xl bg-gray-50 flex items-center justify-center mb-4"
+                >
+                    <span
+                        class="iconify simple-line-icons--pencil text-2xl opacity-20"
+                    ></span>
+                </div>
+                <p class="text-sm font-medium text-gray-400">
+                    在此开启你的第一个问题
+                </p>
+                <p class="text-xs text-gray-300 mt-1">
+                    直接在下方输入框提问即可
+                </p>
+            </div>
+        {/if}
     {/each}
 </div>
 

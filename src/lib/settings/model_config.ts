@@ -49,9 +49,6 @@ export const MODELS: Record<string, ModelConfig> = {
     requiresStream: true,
     defaultTemperature: 0.7,
   },
-  // ⚠️ 以下模型名称需要在 bianxie 控制台确认是否正确
-  // 已验证可用：gemini-3-flash-preview（outputTokens>0, finishReason=stop）
-  // 未知/可能无效：gemini-3-flash-preview-thinking（outputTokens=0, rawFinishReason=undefined）
   "gemini-3.1-pro-preview": {
     // $1.25 - $10
     displayName: "Ge3.1 Pro",
@@ -60,26 +57,10 @@ export const MODELS: Record<string, ModelConfig> = {
     requiresStream: true,
     defaultTemperature: 0.7,
   },
-  "gemini-3-flash-preview": {
-    // $0.3 - $2.5
-    displayName: "Ge3 Flash",
-    fullName: "Gemini 3.0 Flash",
-    serverType: "bianxie",
-    requiresStream: true,
-    defaultTemperature: 0.7,
-  },
   "gemini-3-flash-preview-thinking": {
     // $0.3 - $2.5
     displayName: "Ge3 Flash T",
     fullName: "Gemini 3.0 Flash Thinking",
-    serverType: "bianxie",
-    requiresStream: true,
-    defaultTemperature: 0.7,
-  },
-  "gpt-5.3-codex": {
-    // $1.25 - $10
-    displayName: "GPT5.3-C",
-    fullName: "GPT5.3-codex",
     serverType: "bianxie",
     requiresStream: true,
     defaultTemperature: 0.7,
