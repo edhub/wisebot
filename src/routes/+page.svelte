@@ -4,6 +4,7 @@
     import { query } from "$lib/chat/query_api";
     import ChatContainer from "$lib/chat/ChatContainer.svelte";
     import ChatInput from "$lib/chat/ChatInput.svelte";
+    import Lightbox from "$lib/chat/Lightbox.svelte";
     import Menu from "$lib/settings/Menu.svelte";
     import Sidebar from "$lib/sidebar/Sidebar.svelte";
     import {
@@ -447,3 +448,4 @@
 
 <Menu bind:showMenu clearChat={clearNonFavoriteChats} />
 <ConfirmDialog />
+<Lightbox />

@@ -3,8 +3,8 @@
     import "highlight.js/styles/github-dark-dimmed.min.css";
     import type { QandA } from "./ChatStore.svelte";
 
-    import { fade } from "svelte/transition";
     import { getContext } from "svelte";
+    import { openLightbox } from "./lightboxStore.svelte";
 
     let {
         qandA,
@@ -22,18 +22,6 @@
 
     let isRespOngoing = $derived(qandA.isResponseOngoing ?? false);
     let answerHtml = $derived(parseMarkdown(qandA.answer));
-
-    let lightboxOpen = $state(false);
-
-    function openLightbox() {
-        lightboxOpen = true;
-    }
-    function closeLightbox() {
-        lightboxOpen = false;
-    }
-    function handleLightboxKeydown(e: KeyboardEvent) {
-        if (e.key === "Escape") closeLightbox();
-    }
 
     let toast: { show: (msg: string) => void } = getContext("toast");
 
@@ -246,7 +234,7 @@
                             src={qandA.imageUrl}
                             alt="User uploaded"
                             class="max-h-32 rounded-lg my-4 border border-gray-200 shadow-sm cursor-zoom-in hover:opacity-90 transition-opacity"
-                            onclick={openLightbox}
+                            onclick={() => openLightbox(qandA.imageUrl!)}
                         />
                     </div>
                 {/if}
@@ -296,33 +284,6 @@
                 onclick={() => onFollowUp?.(qandA)}
             >
                 追问
-            </button>
-        </div>
-    {/if}
-
-    <!-- Lightbox -->
-    {#if lightboxOpen && qandA.imageUrl}
-        <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-        <div
-            role="dialog"
-            class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
-            transition:fade={{ duration: 150 }}
-            onclick={closeLightbox}
-            onkeydown={handleLightboxKeydown}
-        >
-            <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_noninteractive_element_interactions -->
-            <img
-                src={qandA.imageUrl}
-                alt="Full size"
-                class="max-w-[90vw] max-h-[90vh] rounded-xl shadow-2xl object-contain cursor-zoom-out"
-                onclick={(e) => e.stopPropagation()}
-            />
-            <button
-                class="absolute top-4 right-5 text-white text-3xl leading-none hover:text-gray-300 transition-colors"
-                onclick={closeLightbox}
-                aria-label="关闭"
-            >
-                ✕
             </button>
         </div>
     {/if}
