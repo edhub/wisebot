@@ -1,6 +1,10 @@
 <script lang="ts">
-    import { tick } from "svelte";
-    import { MODELS, getCurrentModel, setCurrentModel } from "$lib/settings/model_config";
+    import { tick, onMount } from "svelte";
+    import {
+        MODELS,
+        getCurrentModel,
+        setCurrentModel,
+    } from "$lib/settings/model_config";
     import type { QandA } from "./ChatStore.svelte";
     import { saveImage, generateId } from "./ChatStore.svelte";
 
@@ -34,10 +38,15 @@
 
     async function resizeTextarea() {
         await tick();
+        // 先隐藏滚动条再重置高度，避免 "auto" 瞬间触发浏览器默认滚动条
+        textarea.style.overflowY = "hidden";
         textarea.style.height = "auto";
         const maxHeight = window.innerHeight * 0.5;
         const desiredHeight = Math.min(textarea.scrollHeight, maxHeight);
         textarea.style.height = desiredHeight + "px";
+        // 只有内容被截断（达到最大高度）时才允许滚动
+        textarea.style.overflowY =
+            desiredHeight >= maxHeight ? "auto" : "hidden";
     }
 
     async function handleSendMessage(model: string) {
@@ -124,6 +133,10 @@
         lastQA = qa;
     }
 
+    onMount(() => {
+        resizeTextarea();
+    });
+
     function formatLastQA(qa?: QandA) {
         if (!qa) return "";
         return qa.answer.length > 100
@@ -136,7 +149,7 @@
 <form class="flex flex-col">
     <div class="px-2 pb-2">
         {#if imageBase64}
-            <div class="relative inline-block mb-2 group">
+            <div class="relative inline-block mt-4 group">
                 <img
                     src={imageBase64}
                     alt="Preview"
@@ -153,7 +166,7 @@
         {/if}
         {#if lastQA}
             <div
-                class="flex items-center justify-between px-2 text-sm text-gray-600"
+                class="flex items-center justify-between px-2 mt-2 text-sm text-gray-600"
             >
                 <div class="max-h-16 overflow-y-hidden flex-1">
                     {formatLastQA(lastQA)}
@@ -174,7 +187,7 @@
                     id="chat-input"
                     placeholder="输入消息或粘贴图片..."
                     bind:value={question}
-                    class="p-2 pr-10 resize-none w-full rounded-xl border border-gray-200 focus:outline-none transition-all touch-manipulation"
+                    class="p-2 pr-10 resize-none overflow-hidden w-full rounded-xl border border-gray-200 focus:outline-none transition-all touch-manipulation"
                     rows="1"
                     maxlength="10000"
                     onkeydown={handleKeyDown}

@@ -23,6 +23,18 @@
     let isRespOngoing = $derived(qandA.isResponseOngoing ?? false);
     let answerHtml = $derived(parseMarkdown(qandA.answer));
 
+    let lightboxOpen = $state(false);
+
+    function openLightbox() {
+        lightboxOpen = true;
+    }
+    function closeLightbox() {
+        lightboxOpen = false;
+    }
+    function handleLightboxKeydown(e: KeyboardEvent) {
+        if (e.key === "Escape") closeLightbox();
+    }
+
     let toast: { show: (msg: string) => void } = getContext("toast");
 
     function handleUrlNavigation(e: Event) {
@@ -190,7 +202,8 @@
                         title="下载 Markdown"
                         onclick={() => downloadAsMarkdown(qandA)}
                     >
-                        <span class="iconify simple-line-icons--cloud-download"></span>
+                        <span class="iconify simple-line-icons--cloud-download"
+                        ></span>
                     </button>
                     <button
                         class="p-1 text-base hover:text-gray-600 active:scale-90 transition-all touch-manipulation"
@@ -227,11 +240,13 @@
                 onclick={handleUrlNavigation}
             >
                 {#if qandA.imageUrl}
-                    <div class="mb-3">
+                    <div>
+                        <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_noninteractive_element_interactions -->
                         <img
                             src={qandA.imageUrl}
                             alt="User uploaded"
-                            class="max-h-64 rounded-lg border border-gray-200 shadow-sm"
+                            class="max-h-32 rounded-lg my-4 border border-gray-200 shadow-sm cursor-zoom-in hover:opacity-90 transition-opacity"
+                            onclick={openLightbox}
                         />
                     </div>
                 {/if}
@@ -284,13 +299,46 @@
             </button>
         </div>
     {/if}
+
+    <!-- Lightbox -->
+    {#if lightboxOpen && qandA.imageUrl}
+        <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+        <div
+            role="dialog"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+            transition:fade={{ duration: 150 }}
+            onclick={closeLightbox}
+            onkeydown={handleLightboxKeydown}
+        >
+            <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_noninteractive_element_interactions -->
+            <img
+                src={qandA.imageUrl}
+                alt="Full size"
+                class="max-w-[90vw] max-h-[90vh] rounded-xl shadow-2xl object-contain cursor-zoom-out"
+                onclick={(e) => e.stopPropagation()}
+            />
+            <button
+                class="absolute top-4 right-5 text-white text-3xl leading-none hover:text-gray-300 transition-colors"
+                onclick={closeLightbox}
+                aria-label="关闭"
+            >
+                ✕
+            </button>
+        </div>
+    {/if}
 </div>
 
 <style>
     @keyframes blink {
-        0% { opacity: 1; }
-        50% { opacity: 0.2; }
-        100% { opacity: 1; }
+        0% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.2;
+        }
+        100% {
+            opacity: 1;
+        }
     }
 
     .blink {
