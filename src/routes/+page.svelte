@@ -9,6 +9,7 @@
     import Sidebar from "$lib/sidebar/Sidebar.svelte";
     import {
         chatState,
+        getChatLog,
         generateId,
         saveChatLog,
         addMessage,
@@ -16,7 +17,8 @@
         type QandA,
     } from "$lib/chat/ChatStore.svelte";
     import { openConfirm } from "$lib/shared/confirm.svelte";
-    import { MODELS, setCurrentModel } from "$lib/settings/model_config";
+    import { MODELS } from "$lib/settings/model_config";
+    import { setCurrentModel } from "$lib/settings/modelState.svelte";
     import ConfirmDialog from "$lib/shared/ConfirmDialog.svelte";
 
     let showMenu = $state(false);
@@ -208,7 +210,9 @@
             });
         };
 
-        chatState.chatLog;
+        // 读取 _chatLog 以将其纳入当前 $effect 的依赖追踪，
+        // 消息列表变化时自动重新注册 IntersectionObserver，返回值无需使用。
+        getChatLog();
         tick().then(refresh);
 
         return () => {

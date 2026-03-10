@@ -21,6 +21,7 @@
     } = $props();
 
     let isRespOngoing = $derived(qandA.isResponseOngoing ?? false);
+    let questionHtml = $derived(parseMarkdown(qandA.question));
     let answerHtml = $derived(parseMarkdown(qandA.answer));
 
     let toast: { show: (msg: string) => void } = getContext("toast");
@@ -238,7 +239,7 @@
                         />
                     </div>
                 {/if}
-                {@html qandA.question}
+                {@html questionHtml}
             </article>
             <div class="flex text-xs px-4 items-center">
                 <span class="text-gray-800 font-bold">

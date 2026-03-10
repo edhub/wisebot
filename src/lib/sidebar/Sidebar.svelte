@@ -1,6 +1,7 @@
 <script lang="ts">
     import {
         chatState,
+        getRootMessages,
         toggleFavorite,
         deleteGroup,
         type QandA,
@@ -48,7 +49,7 @@
         return groups.filter((g) => g.items.length > 0);
     }
 
-    const groupedRoots = $derived(groupRootMessages(chatState.rootMessages));
+    const groupedRoots = $derived(groupRootMessages(getRootMessages()));
 
     // 预构建子节点映射（O(n) 一次遍历），避免模板中每个节点 O(n) filter
     const childrenMap = $derived.by(() => {

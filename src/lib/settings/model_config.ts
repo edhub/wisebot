@@ -137,6 +137,11 @@ export function getCurrentModel(): string {
   return localStorage.getItem(KEY_CURRENT_MODEL) || Object.keys(MODELS)[0];
 }
 
+/**
+ * @deprecated 请使用 `$lib/settings/modelState.svelte` 中的 `setCurrentModel`，
+ * 它同时更新响应式状态，是唯一的写入入口。
+ * 此函数仅保留供 `getCurrentModel` 内部迁移逻辑引用，外部不应直接调用。
+ */
 export function setCurrentModel(modelName: string) {
   if (MODELS[modelName]) {
     localStorage.setItem(KEY_CURRENT_MODEL, modelName);

@@ -1,10 +1,7 @@
 <script lang="ts">
     import { tick, onMount } from "svelte";
-    import {
-        MODELS,
-        getCurrentModel,
-        setCurrentModel,
-    } from "$lib/settings/model_config";
+    import { MODELS } from "$lib/settings/model_config";
+    import { modelState, setCurrentModel } from "$lib/settings/modelState.svelte";
     import type { QandA } from "./ChatStore.svelte";
     import { saveImage, generateId } from "./ChatStore.svelte";
 
@@ -27,15 +24,6 @@
 
     const availableModels = Object.keys(MODELS);
 
-    // 统一使用 model_config 中的 getCurrentModel/setCurrentModel，
-    // 不再维护独立的 KEY_LAST_MODEL，避免两套 localStorage key 不同步
-    let lastModel = $state(getCurrentModel());
-
-    function saveLastModel(model: string) {
-        lastModel = model;
-        setCurrentModel(model);
-    }
-
     async function resizeTextarea() {
         await tick();
         // 先隐藏滚动条再重置高度，避免 "auto" 瞬间触发浏览器默认滚动条
@@ -50,7 +38,7 @@
     }
 
     async function handleSendMessage(model: string) {
-        saveLastModel(model);
+        setCurrentModel(model);
         if (question.trim() || imageBase64) {
             let imageId: string | undefined = undefined;
             let imageUrl: string | undefined = undefined;
@@ -79,7 +67,7 @@
 
         if (e.key === "Enter" && e.keyCode === 13 && !e.altKey && !e.shiftKey) {
             e.preventDefault();
-            handleSendMessage(lastModel);
+            handleSendMessage(modelState.currentModel);
             return;
         }
 
@@ -93,7 +81,7 @@
                 if (question.trim()) {
                     handleSendMessage(selectedModel);
                 } else {
-                    saveLastModel(selectedModel);
+                    setCurrentModel(selectedModel);
                 }
             }
         }
@@ -214,7 +202,7 @@
             <button
                 type="button"
                 class="flex-shrink-0 w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center hover:bg-blue-700 active:scale-95 transition-all disabled:opacity-30 disabled:grayscale disabled:active:scale-100 touch-manipulation"
-                onclick={() => handleSendMessage(lastModel)}
+                onclick={() => handleSendMessage(modelState.currentModel)}
                 disabled={!question.trim() && !imageBase64}
             >
                 <span class="iconify simple-line-icons--plus text-lg"></span>
@@ -226,7 +214,7 @@
             {#each availableModels as model, i}
                 <button
                     type="button"
-                    class="px-2 py-2 rounded-xl transition-colors duration-200 whitespace-nowrap touch-manipulation {lastModel ===
+                    class="px-2 py-2 rounded-xl transition-colors duration-200 whitespace-nowrap touch-manipulation {modelState.currentModel ===
                     model
                         ? 'bg-gray-200 font-bold'
                         : 'bg-gray-100 hover:bg-gray-200'}"

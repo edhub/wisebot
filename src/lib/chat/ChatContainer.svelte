@@ -2,6 +2,7 @@
     import Message from "./Message.svelte";
     import {
         chatState,
+        getChatLog,
         deleteQA,
         toggleFavorite,
         type QandA,
@@ -18,7 +19,7 @@
 </script>
 
 <div bind:this={chatContainer} class="flex flex-col gap-2 pb-32">
-    {#each chatState.chatLog as qa (qa.id)}
+    {#each getChatLog() as qa (qa.id)}
         <div
             id="qa-{qa.id}"
             class="relative transition-all duration-200 qa-item"

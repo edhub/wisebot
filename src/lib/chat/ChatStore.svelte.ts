@@ -40,51 +40,60 @@ function buildChildrenMap(messages: QandA[]): Map<string | undefined, QandA[]> {
 export const chatState = $state({
   messages: [] as QandA[],
   isLoading: true,
-
-  // 派生状态：按树状结构排序的消息列表（O(n) 复杂度）
-  get chatLog() {
-    const msgs = this.messages;
-
-    // 一次遍历构建映射，避免 O(n²) 的 filter
-    const childrenMap = buildChildrenMap(msgs);
-
-    // 对每个分桶排序：顶层按时间倒序，子节点按时间正序
-    childrenMap.forEach((children, key) => {
-      children.sort((a, b) =>
-        key === undefined
-          ? b.createTime - a.createTime
-          : a.createTime - b.createTime,
-      );
-    });
-
-    const result: QandA[] = [];
-    const walk = (parentId?: string) => {
-      const children = childrenMap.get(parentId) ?? [];
-      for (const child of children) {
-        result.push(child);
-        walk(child.id);
-      }
-    };
-
-    walk();
-
-    // 兜底：将游离节点（parentId 指向不存在的节点）追加到末尾
-    if (result.length < msgs.length) {
-      const resultIds = new Set(result.map((m) => m.id));
-      msgs.forEach((m) => {
-        if (!resultIds.has(m.id)) result.push(m);
-      });
-    }
-
-    return result;
-  },
-
-  get rootMessages() {
-    return this.messages
-      .filter((m) => !m.parentId)
-      .sort((a, b) => b.createTime - a.createTime);
-  },
 });
+
+/**
+ * 派生状态：按树状结构排序的消息列表（$derived 缓存，只在 messages 变化时重算）
+ * Svelte 5 模块限制：$derived 不可直接 export，用函数包裹暴露。
+ */
+const _chatLog = $derived.by(() => {
+  const msgs = chatState.messages;
+
+  const childrenMap = buildChildrenMap(msgs);
+
+  childrenMap.forEach((children, key) => {
+    children.sort((a, b) =>
+      key === undefined
+        ? b.createTime - a.createTime
+        : a.createTime - b.createTime,
+    );
+  });
+
+  const result: QandA[] = [];
+  const walk = (parentId?: string) => {
+    const children = childrenMap.get(parentId) ?? [];
+    for (const child of children) {
+      result.push(child);
+      walk(child.id);
+    }
+  };
+
+  walk();
+
+  if (result.length < msgs.length) {
+    const resultIds = new Set(result.map((m) => m.id));
+    msgs.forEach((m) => {
+      if (!resultIds.has(m.id)) result.push(m);
+    });
+  }
+
+  return result;
+});
+
+/** 派生状态：仅顶层消息，按时间倒序（$derived 缓存） */
+const _rootMessages = $derived.by(() =>
+  chatState.messages
+    .filter((m) => !m.parentId)
+    .sort((a, b) => b.createTime - a.createTime),
+);
+
+export function getChatLog() {
+  return _chatLog;
+}
+
+export function getRootMessages() {
+  return _rootMessages;
+}
 
 /**
  * 初始化数据：从 IndexedDB 加载并处理迁移
