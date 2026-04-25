@@ -1,6 +1,28 @@
 import { Marked, type Tokens } from "marked";
-import hljs from "highlight.js";
+import hljs from "highlight.js/lib/core";
+import javascript from "highlight.js/lib/languages/javascript";
+import typescript from "highlight.js/lib/languages/typescript";
+import python from "highlight.js/lib/languages/python";
+import json from "highlight.js/lib/languages/json";
+import bash from "highlight.js/lib/languages/bash";
+import css from "highlight.js/lib/languages/css";
+import xml from "highlight.js/lib/languages/xml";
+import sql from "highlight.js/lib/languages/sql";
+import yaml from "highlight.js/lib/languages/yaml";
+import markdown from "highlight.js/lib/languages/markdown";
 import markedKatex from "marked-katex-extension";
+
+// 注册常用语言（避免全量引入 384 种语言）
+hljs.registerLanguage("javascript", javascript);
+hljs.registerLanguage("typescript", typescript);
+hljs.registerLanguage("python", python);
+hljs.registerLanguage("json", json);
+hljs.registerLanguage("bash", bash);
+hljs.registerLanguage("css", css);
+hljs.registerLanguage("xml", xml);
+hljs.registerLanguage("sql", sql);
+hljs.registerLanguage("yaml", yaml);
+hljs.registerLanguage("markdown", markdown);
 
 /**
  * Markdown 渲染工具，集中管理渲染逻辑，避免重复全局配置导致内存膨胀。

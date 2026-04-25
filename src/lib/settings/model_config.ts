@@ -41,22 +41,14 @@ export interface ModelConfig {
 }
 
 export const MODELS: Record<string, ModelConfig> = {
-  "deepseek-chat": {
-    // $0.28 - $0.42
-    displayName: "DS",
-    fullName: "Deepseek Chat",
-    serverType: "deepseek",
-    requiresStream: true,
-    defaultTemperature: 0.7,
-  },
-  "gemini-3.1-pro-preview-thinking": {
-    // $1.25 - $10
-    displayName: "Ge3.1 Pro",
-    fullName: "Gemini 3.1 Pro Thinking",
-    serverType: "bianxie",
-    requiresStream: true,
-    defaultTemperature: 0.7,
-  },
+  // "gemini-3.1-pro-preview-thinking": {
+  //   // $1.25 - $10
+  //   displayName: "Ge3.1 Pro",
+  //   fullName: "Gemini 3.1 Pro Thinking",
+  //   serverType: "bianxie",
+  //   requiresStream: true,
+  //   defaultTemperature: 0.7,
+  // },
   "gemini-3-flash-preview-thinking": {
     // $0.3 - $2.5
     displayName: "Ge3 Flash",
@@ -65,10 +57,26 @@ export const MODELS: Record<string, ModelConfig> = {
     requiresStream: true,
     defaultTemperature: 0.7,
   },
-  "deepseek-reasoner": {
+  "claude-sonnet-4.6-thinking": {
+    // $0.3 - $2.5
+    displayName: "Sonnet4.6",
+    fullName: "Claude Sonnet 4.6 Thinking",
+    serverType: "bianxie",
+    requiresStream: true,
+    defaultTemperature: 0.7,
+  },
+  "deepseek-v4-flash": {
     // $0.28 - $0.42
-    displayName: "DS-R",
-    fullName: "Deepseek Reasoner",
+    displayName: "DS-v4 Flash",
+    fullName: "Deepseek v4 Flash",
+    serverType: "deepseek",
+    requiresStream: true,
+    defaultTemperature: 0.7,
+  },
+  "deepseek-v4-pro": {
+    // $0.28 - $0.42
+    displayName: "DS-v4 Pro",
+    fullName: "Deepseek v4 Pro",
     serverType: "deepseek",
     requiresStream: true,
     defaultTemperature: 0.7,
