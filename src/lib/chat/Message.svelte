@@ -135,22 +135,24 @@
     });
 </script>
 
-<div role="article" class="group">
-    <!-- 操作栏 -->
-    <div class="flex text-gray-400 items-center pl-1 pr-1 h-7">
+<div role="article" class="group min-w-0">
+    <!-- 操作栏：与下方卡片内文左右对齐（px-4） -->
+    <div
+        class="mb-0.5 flex h-7 w-full min-w-0 items-center justify-between gap-2 px-4 text-content-muted"
+    >
         <!-- 左侧：常用操作（图标按钮） -->
         <div
-            class="flex items-center gap-3 flex-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:pointer-events-none md:group-hover:pointer-events-auto transition-opacity duration-200"
+            class="flex min-w-0 flex-1 items-center gap-0.5 opacity-100 transition-opacity duration-200 md:pointer-events-none md:opacity-0 md:group-hover:pointer-events-auto md:group-hover:opacity-100"
         >
             <button
-                class="p-1 text-base hover:text-gray-600 active:scale-90 transition-all touch-manipulation"
+                class="btn btn-ghost btn-sm p-0 min-h-0 h-7 w-7 text-base text-content-muted transition-colors duration-200 hover:bg-base-200/80 hover:text-base-content/90 active:scale-90 rounded-md"
                 title="再次发送"
                 onclick={() => onResendMessage?.(qandA)}
             >
                 <span class="iconify simple-line-icons--reload"></span>
             </button>
             <button
-                class="p-1 text-base hover:text-gray-600 active:scale-90 transition-all touch-manipulation"
+                class="btn btn-ghost btn-sm p-0 min-h-0 h-7 w-7 text-base text-content-muted transition-colors duration-200 hover:bg-base-200/80 hover:text-base-content/90 active:scale-90 rounded-md"
                 title="复制问题"
                 onclick={() => copyToClipboard(qandA.question, "问题已复制")}
             >
@@ -158,14 +160,14 @@
             </button>
             {#if !isRespOngoing && qandA.answer.length > 0}
                 <button
-                    class="p-1 text-base hover:text-gray-600 active:scale-90 transition-all touch-manipulation"
+                    class="btn btn-ghost btn-sm p-0 min-h-0 h-7 w-7 text-base text-content-muted transition-colors duration-200 hover:bg-base-200/80 hover:text-base-content/90 active:scale-90 rounded-md"
                     title="复制回复"
                     onclick={() => copyToClipboard(qandA.answer, "回复已复制")}
                 >
                     <span class="iconify simple-line-icons--doc"></span>
                 </button>
                 <button
-                    class="p-1 text-base hover:text-gray-600 active:scale-90 transition-all touch-manipulation"
+                    class="btn btn-ghost btn-sm p-0 min-h-0 h-7 w-7 text-base text-content-muted transition-colors duration-200 hover:bg-base-200/80 hover:text-primary active:scale-90 rounded-md"
                     title="追问"
                     onclick={() => onFollowUp?.(qandA)}
                 >
@@ -174,12 +176,12 @@
             {/if}
         </div>
         <!-- 右侧：次要操作 -->
-        <div class="flex items-center gap-3">
+        <div class="flex shrink-0 items-center gap-0.5">
             <div
-                class="flex items-center gap-3 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:pointer-events-none md:group-hover:pointer-events-auto transition-opacity duration-200"
+                class="flex items-center gap-0.5 opacity-100 transition-opacity duration-200 md:pointer-events-none md:opacity-0 md:group-hover:pointer-events-auto md:group-hover:opacity-100"
             >
                 <button
-                    class="p-1 text-base hover:text-red-400 active:scale-90 transition-all touch-manipulation"
+                    class="btn btn-ghost btn-sm p-0 min-h-0 h-7 w-7 text-base text-content-muted transition-colors duration-200 hover:bg-error/10 hover:text-error active:scale-90 rounded-md"
                     title="删除"
                     onclick={() => deleteQA(qandA)}
                 >
@@ -187,7 +189,7 @@
                 </button>
                 {#if !isRespOngoing}
                     <button
-                        class="p-1 text-base hover:text-gray-600 active:scale-90 transition-all touch-manipulation"
+                        class="btn btn-ghost btn-sm p-0 min-h-0 h-7 w-7 text-base text-content-muted transition-colors duration-200 hover:bg-base-200/80 hover:text-base-content/90 active:scale-90 rounded-md"
                         title="下载 Markdown"
                         onclick={() => downloadAsMarkdown(qandA)}
                     >
@@ -195,7 +197,7 @@
                         ></span>
                     </button>
                     <button
-                        class="p-1 text-base hover:text-gray-600 active:scale-90 transition-all touch-manipulation"
+                        class="btn btn-ghost btn-sm p-0 min-h-0 h-7 w-7 text-base text-content-muted transition-colors duration-200 hover:bg-base-200/80 hover:text-base-content/90 active:scale-90 rounded-md"
                         title="存入 Bear"
                         onclick={() => createBearNote(qandA)}
                     >
@@ -205,27 +207,33 @@
             </div>
             <!-- svelte-ignore a11y_consider_explicit_label -->
             <button
-                class="p-1 text-base transition-opacity duration-200 {qandA.favorite
+                class="btn btn-ghost btn-sm p-0 min-h-0 h-7 w-7 text-base transition-opacity duration-200 rounded-md hover:bg-amber-500/10 {qandA.favorite
                     ? 'opacity-100'
                     : 'opacity-100 md:opacity-0 md:group-hover:opacity-100'}"
                 onclick={() => toggleFavorite(qandA)}
             >
                 <span
                     class="{qandA.favorite
-                        ? 'text-amber-400'
-                        : 'text-gray-400'} iconify simple-line-icons--star"
+                        ? 'text-favorite'
+                        : 'text-content-muted'} iconify simple-line-icons--star"
                 ></span>
             </button>
         </div>
     </div>
 
     <!-- 消息卡片 -->
-    <div class="rounded-lg border-gray-200 border overflow-hidden">
-        <div class="bg-gray-50">
-            <div class="h-2 bg-gray-300"></div>
+    <div
+        class="card overflow-hidden rounded-box border border-base-200/80 bg-base-100 shadow-sm ring-1 ring-base-200/30"
+    >
+        <div
+            class="bg-gradient-to-b from-primary/[0.04] to-base-200/90"
+        >
+            <div
+                class="h-1 w-full bg-gradient-to-r from-primary/45 via-primary/25 to-primary/5"
+            ></div>
             <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_noninteractive_element_interactions -->
             <article
-                class="prose py-2 px-4 max-w-none text-gray-800"
+                class="prose prose-base prose-neutral max-w-none px-4 py-2.5 text-base leading-6 text-content-secondary [&_a]:text-primary [&_a]:no-underline [&_a:hover]:underline"
                 onclick={handleUrlNavigation}
             >
                 {#if qandA.imageUrl}
@@ -234,24 +242,26 @@
                         <img
                             src={qandA.imageUrl}
                             alt="User uploaded"
-                            class="max-h-32 rounded-lg my-4 border border-gray-200 shadow-sm cursor-zoom-in hover:opacity-90 transition-opacity"
+                            class="max-h-32 rounded-lg my-4 border border-base-200/80 shadow-sm cursor-zoom-in transition-opacity hover:opacity-90"
                             onclick={() => openLightbox(qandA.imageUrl!)}
                         />
                     </div>
                 {/if}
                 {@html questionHtml}
             </article>
-            <div class="flex text-xs px-4 items-center">
-                <span class="text-gray-800 font-bold">
+            <div
+                class="flex items-baseline gap-x-2 gap-y-0 px-4 pb-2.5 pt-0 text-xs leading-tight"
+            >
+                <span class="shrink-0 font-medium text-content-muted/85">
                     {qandA.botName}
                 </span>
                 {#if isRespOngoing}
-                    <span class="ml-2 text-gray-400 text-xs">
+                    <span class="tabular-nums text-content-muted">
                         {formatTime(elapsedTime)}s
                     </span>
                 {/if}
                 {#if !isRespOngoing && qandA.firstResponseTime !== undefined}
-                    <span class="ml-2 text-gray-400">
+                    <span class="tabular-nums text-content-muted">
                         {formatResponseTimes(
                             qandA.firstResponseTime,
                             qandA.completionTime,
@@ -260,10 +270,12 @@
                 {/if}
             </div>
         </div>
-        <hr class="ml-4 w-1/3 border-gray-300" />
+        <div
+            class="h-px w-full bg-gradient-to-r from-transparent via-base-200 to-transparent"
+        ></div>
         <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_noninteractive_element_interactions -->
         <article
-            class="prose mt-5 pb-2 px-4 max-w-none"
+            class="prose prose-base prose-neutral mt-0 max-w-none bg-base-100/50 px-4 pb-4 pt-3 text-base leading-7 text-base-content/95 [&_a]:text-primary [&_a]:no-underline [&_a:hover]:underline"
             onclick={handleUrlNavigation}
         >
             {#if qandA.answer.length === 0 && isRespOngoing}
@@ -278,10 +290,10 @@
 
     <!-- 底部追问按钮（唯一入口，位置更贴近内容） -->
     {#if !isRespOngoing && qandA.answer.length > 0}
-        <div class="flex justify-end mt-1 pr-1">
+        <div class="mt-1.5 flex justify-end px-4">
             <button
                 type="button"
-                class="text-xs text-gray-400 hover:text-gray-600 transition-colors touch-manipulation"
+                class="btn btn-ghost btn-xs min-h-0 h-auto gap-0.5 border-0 p-0 font-medium normal-case text-content-muted no-underline opacity-80 transition-all duration-200 hover:bg-transparent hover:opacity-100 hover:text-primary"
                 onclick={() => onFollowUp?.(qandA)}
             >
                 追问

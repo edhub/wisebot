@@ -10,17 +10,17 @@
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div class="flex flex-col gap-4">
-    <div>
-        <p class="text-lg font-bold">API 配置</p>
-        <hr class="my-2" />
+<div class="flex min-w-0 flex-col gap-5">
+    <div class="min-w-0">
+        <p class="text-lg font-bold text-base-content">API 配置</p>
+        <div class="divider my-2"></div>
     </div>
 
-    <div>
-        <p class="mt-2 mb-1">便携 API Key</p>
+    <div class="min-w-0">
+        <p class="mb-1.5 text-sm font-medium text-base-content">便携 API Key</p>
         <div
             onclick={(e) => e.stopPropagation()}
-            class="rounded-xl bg-gray-200 p-2 overflow-clip"
+            class="overflow-clip rounded-xl bg-base-300 p-2.5"
         >
             <InplaceEdit
                 bind:value={bianxieApiKey}
@@ -29,11 +29,11 @@
         </div>
     </div>
 
-    <div>
-        <p class="mt-2 mb-1">阿里云 API Key</p>
+    <div class="min-w-0">
+        <p class="mb-1.5 text-sm font-medium text-base-content">阿里云 API Key</p>
         <div
             onclick={(e) => e.stopPropagation()}
-            class="rounded-xl bg-gray-200 p-2 overflow-clip"
+            class="overflow-clip rounded-xl bg-base-300 p-2.5"
         >
             <InplaceEdit
                 bind:value={aliyunApiKey}
@@ -42,11 +42,11 @@
         </div>
     </div>
 
-    <div>
-        <p class="mt-2 mb-1">DeepSeek API Key</p>
+    <div class="min-w-0">
+        <p class="mb-1.5 text-sm font-medium text-base-content">DeepSeek API Key</p>
         <div
             onclick={(e) => e.stopPropagation()}
-            class="rounded-xl bg-gray-200 p-2 overflow-clip"
+            class="overflow-clip rounded-xl bg-base-300 p-2.5"
         >
             <InplaceEdit
                 bind:value={deepseekApiKey}

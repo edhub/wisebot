@@ -39,14 +39,14 @@
         onkeydown={handleKeydown}
         onblur={handleBlur}
         autofocus
-        class="w-full bg-transparent outline-none text-sm"
+        class="input input-ghost input-sm w-full min-h-0 h-7 px-0 text-sm"
     />
 {:else}
     <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
     <div
         role="button"
         tabindex="0"
-        class="whitespace-nowrap overflow-hidden text-ellipsis text-sm cursor-pointer"
+        class="whitespace-nowrap overflow-hidden text-ellipsis text-sm text-content-secondary transition-colors cursor-pointer hover:text-primary"
         onclick={() => {
             editing = true;
             tempValue = value;

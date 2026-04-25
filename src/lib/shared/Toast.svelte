@@ -67,7 +67,7 @@
 {#if currentToast}
     <div
         transition:fade={{ duration: 150 }}
-        class="fixed px-3 py-2 bg-blue-500 text-white text-sm rounded-xl shadow-lg z-50"
+        class="px-3 py-2 text-sm font-normal bg-primary text-primary-content rounded-xl shadow-lg z-50"
         style={currentToast?.position}
     >
         {currentToast?.value}

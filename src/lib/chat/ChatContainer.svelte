@@ -18,7 +18,7 @@
     let chatContainer: HTMLDivElement;
 </script>
 
-<div bind:this={chatContainer} class="flex flex-col gap-2 pb-32">
+<div bind:this={chatContainer} class="flex min-w-0 flex-col gap-2">
     {#each getChatLog() as qa (qa.id)}
         <div
             id="qa-{qa.id}"
@@ -35,28 +35,28 @@
     {:else}
         {#if chatState.isLoading}
             <div
-                class="flex flex-col items-center justify-center py-20 text-gray-300"
+                class="flex flex-col items-center justify-center px-4 py-20 text-center text-content-subtle"
             >
-                <div
-                    class="w-8 h-8 rounded-full border-2 border-gray-200 border-t-gray-400 animate-spin mb-4"
-                ></div>
-                <p class="text-sm text-gray-400">加载中…</p>
+                <span
+                    class="loading loading-spinner loading-md text-primary mb-4"
+                ></span>
+                <p class="text-sm text-content-muted">加载中…</p>
             </div>
         {:else}
             <div
-                class="flex flex-col items-center justify-center py-20 text-gray-300"
+                class="flex flex-col items-center justify-center px-4 py-20 text-center text-content-subtle"
             >
                 <div
-                    class="w-16 h-16 rounded-3xl bg-gray-50 flex items-center justify-center mb-4"
+                    class="mb-4 flex h-16 w-16 items-center justify-center rounded-3xl border border-dashed border-base-300/60 bg-gradient-to-b from-base-200/50 to-base-100/80 shadow-inner"
                 >
                     <span
-                        class="iconify simple-line-icons--pencil text-2xl opacity-20"
+                        class="iconify simple-line-icons--pencil text-2xl text-primary/20"
                     ></span>
                 </div>
-                <p class="text-sm font-medium text-gray-400">
+                <p class="text-sm font-medium text-content-secondary">
                     在此开启你的第一个问题
                 </p>
-                <p class="text-xs text-gray-300 mt-1">
+                <p class="mt-1 text-xs text-content-muted/90">
                     直接在下方输入框提问即可
                 </p>
             </div>

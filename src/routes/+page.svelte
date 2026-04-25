@@ -316,12 +316,12 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
-    class="flex h-screen w-full overflow-hidden bg-white text-gray-900 relative"
+    class="flex h-screen w-full overflow-hidden bg-base-100 text-base-content relative"
     onmouseup={handleMouseUp}
 >
     <!-- 左侧：问答历史列表 -->
     <aside
-        class="fixed inset-y-0 left-0 z-[70] w-3/4 max-w-[300px] bg-white shadow-2xl border-r border-gray-100/50 transition-transform duration-300 md:relative md:shadow-none md:translate-x-0 md:w-1/4 md:min-w-[280px] md:max-w-[380px]"
+        class="fixed inset-y-0 left-0 z-[70] w-3/4 max-w-[300px] border-r border-base-200/80 bg-transparent shadow-2xl transition-transform duration-300 md:relative md:w-1/4 md:min-w-[280px] md:max-w-[380px] md:translate-x-0 md:shadow-none"
         class:-translate-x-full={!showSidebar}
     >
         <Sidebar
@@ -334,7 +334,7 @@
     <!-- Mobile Overlay -->
     {#if showSidebar}
         <div
-            class="fixed inset-0 bg-black/20 z-[60] md:hidden"
+            class="fixed inset-0 bg-[rgba(0,0,0,0.2)] z-[60] md:hidden"
             onclick={() => (showSidebar = false)}
             transition:fade={{ duration: 200 }}
         ></div>
@@ -343,13 +343,13 @@
     <!-- 移动端悬浮按钮 -->
     {#if !showSidebar}
         <div
-            class="md:hidden fixed bottom-6 left-4 z-[65] flex gap-2"
+            class="fixed bottom-6 left-4 z-[65] flex items-center gap-2 md:hidden"
             transition:fade={{ duration: 200 }}
         >
             <button
                 type="button"
                 onclick={() => (showSidebar = true)}
-                class="w-10 h-10 bg-white/90 backdrop-blur border border-gray-200 rounded-xl flex items-center justify-center text-gray-600 shadow-lg active:scale-95 transition-all touch-manipulation"
+                class="btn btn-ghost btn-square w-10 h-10 min-h-0 border border-base-200/80 bg-base-100/85 text-content-secondary shadow-lg backdrop-blur-md transition-transform duration-200 hover:border-primary/25 hover:shadow-md active:scale-95"
                 title="展开历史记录"
             >
                 <span class="iconify simple-line-icons--menu"></span>
@@ -357,7 +357,7 @@
             <button
                 type="button"
                 onclick={() => (showMenu = true)}
-                class="w-10 h-10 bg-white/90 backdrop-blur border border-gray-200 rounded-xl flex items-center justify-center text-gray-400 shadow-lg active:scale-95 transition-all touch-manipulation"
+                class="btn btn-ghost btn-square w-10 h-10 min-h-0 border border-base-200/80 bg-base-100/85 text-content-muted shadow-lg backdrop-blur-md transition-transform duration-200 hover:border-primary/20 hover:shadow-md active:scale-95"
                 title="系统设置"
             >
                 <span class="iconify simple-line-icons--settings"></span>
@@ -365,12 +365,14 @@
         </div>
     {/if}
 
-    <!-- 右侧：问答详情 -->
-    <main class="flex-1 flex flex-col relative min-w-0 h-full bg-white">
+    <!-- 右侧：问答详情（极浅竖向渐变，与侧栏/白底输入卡形成层次） -->
+    <main
+        class="flex-1 flex flex-col relative min-w-0 h-full min-h-0 bg-gradient-to-b from-base-200/25 via-base-100 to-base-100"
+    >
         <!-- 展开时的输入框覆盖层 -->
         {#if isInputExpanded}
             <div
-                class="fixed inset-0 z-[80] flex items-start justify-center pt-12 md:pt-20 px-4 md:px-6 bg-gray-900/5 backdrop-blur-[2px]"
+                class="fixed inset-0 z-[80] flex items-start justify-center bg-base-content/5 px-4 pt-12 backdrop-blur-[2px] sm:px-6 md:pt-20"
                 transition:fade={{ duration: 200 }}
                 onclick={() => (isInputExpanded = false)}
             >
@@ -379,7 +381,7 @@
                     onclick={(e) => e.stopPropagation()}
                 >
                     <div
-                        class="bg-white border border-gray-200 rounded-2xl shadow-2xl shadow-gray-400/20 overflow-hidden"
+                        class="card overflow-hidden rounded-2xl border border-base-200/90 bg-base-100/95 shadow-2xl shadow-primary/[0.07] ring-1 ring-base-200/50 backdrop-blur-sm"
                     >
                         <ChatInput
                             bind:this={chatInput}
@@ -387,11 +389,15 @@
                             onEscape={() => (isInputExpanded = false)}
                         />
                     </div>
-                    <div class="flex justify-between items-center px-2 mt-3">
-                        <p class="text-xs text-gray-500/80">
+                    <div
+                        class="mt-3 flex items-start justify-between gap-4 px-4 text-xs text-content-placeholder"
+                    >
+                        <p class="min-w-0 flex-1 leading-relaxed">
                             开启新问题或点击"追问"建立跟贴分支。
                         </p>
-                        <p class="text-xs text-gray-500/80 font-medium">
+                        <p
+                            class="shrink-0 text-right font-medium tabular-nums tracking-tight"
+                        >
                             ESC 收起
                         </p>
                     </div>
@@ -403,9 +409,9 @@
         <div
             bind:this={scrollContainer}
             onscroll={handleScroll}
-            class="flex-1 overflow-y-auto scroll-smooth scrollbar-thin pt-6"
+            class="flex-1 min-h-0 scroll-smooth overflow-y-auto pt-4 scrollbar-thin sm:pt-5"
         >
-            <div class="max-w-5xl mx-auto w-full px-4 md:px-2 pb-8">
+            <div class="mx-auto w-full max-w-4xl px-4 pb-32 sm:px-6">
                 <ChatContainer
                     resendMessage={(qa) => handleResendMessage(qa)}
                     onFollowUp={handleFollowUp}
@@ -422,7 +428,7 @@
             >
                 <button
                     onclick={handleSelectionFollowUp}
-                    class="flex items-center gap-1.5 px-3 py-1.5 bg-gray-900 text-white text-xs rounded-full shadow-xl hover:bg-blue-600 transition-colors whitespace-nowrap active:scale-95"
+                    class="btn btn-primary btn-sm gap-1.5 rounded-full border-0 text-xs min-h-0 h-auto py-1.5 px-3 normal-case font-medium shadow-lg shadow-primary/30 transition-transform duration-200 hover:brightness-110 active:scale-95"
                 >
                     <span class="iconify simple-line-icons--bubble text-[10px]"
                     ></span>
@@ -434,12 +440,12 @@
         <!-- 收起状态下的新建问题浮动按钮 -->
         {#if !isInputExpanded}
             <div
-                class="fixed bottom-8 right-8 z-[65]"
+                class="fixed bottom-6 right-4 z-[65] sm:bottom-8 sm:right-6"
                 transition:fade={{ duration: 200 }}
             >
                 <button
                     onclick={() => expandInput()}
-                    class="group flex items-center justify-center w-12 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-2xl shadow-blue-200 transition-all active:scale-95 touch-manipulation"
+                    class="btn btn-primary btn-circle w-12 h-12 min-h-0 touch-manipulation border-0 shadow-xl shadow-primary/30 ring-4 ring-base-100 transition-transform duration-200 hover:scale-105 hover:shadow-primary/40 active:scale-95"
                     title="提出新问题"
                 >
                     <span class="iconify simple-line-icons--plus text-xl"

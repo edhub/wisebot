@@ -1,5 +1,32 @@
 import { addIconSelectors } from "@iconify/tailwind";
 import typography from "@tailwindcss/typography";
+import daisyui from "daisyui";
+
+/** 与 STYLES.md 语义色、圆角对齐的 DaisyUI 单主题 */
+const themeWise = {
+  primary: "#2563eb",
+  "primary-content": "#ffffff",
+  secondary: "#1f2937",
+  "secondary-content": "#f9fafb",
+  accent: "#eff6ff",
+  "accent-content": "#1d4ed8",
+  neutral: "#111827",
+  "neutral-content": "#f9fafb",
+  "base-100": "#ffffff",
+  "base-200": "#f9fafb",
+  "base-300": "#e5e7eb",
+  "base-content": "#111827",
+  info: "#3b82f6",
+  success: "#22c55e",
+  warning: "#f59e0b",
+  error: "#ef4444",
+  "error-content": "#ffffff",
+  "--rounded-box": "0.5rem", // rounded-lg 消息卡片
+  "--rounded-btn": "0.75rem", // rounded-xl 按钮/输入
+  "--rounded-badge": "9999px",
+  "--tab-radius": "0.75rem",
+  "--btn-text-case": "none",
+};
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -69,5 +96,11 @@ export default {
         display: "block",
       },
     }),
+    daisyui,
   ],
+  daisyui: {
+    themes: [{ wiselight: themeWise }],
+    darkTheme: false,
+    logs: false,
+  },
 };

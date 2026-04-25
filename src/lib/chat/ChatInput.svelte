@@ -134,18 +134,18 @@
 </script>
 
 <!-- svelte-ignore a11y_consider_explicit_label -->
-<form class="flex flex-col">
-    <div class="px-2 pb-2">
+<form class="flex min-w-0 flex-col">
+    <div class="flex min-w-0 flex-col gap-3 p-4">
         {#if imageBase64}
-            <div class="relative inline-block mt-4 group">
+            <div class="group relative inline-block max-w-full">
                 <img
                     src={imageBase64}
                     alt="Preview"
-                    class="max-h-32 rounded-lg border border-gray-200"
+                    class="max-h-32 rounded-box border border-base-300"
                 />
                 <button
                     type="button"
-                    class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                    class="btn btn-error btn-circle btn-xs absolute -top-2 -right-2 w-6 h-6 min-h-0 p-0 shadow-md opacity-0 transition-opacity group-hover:opacity-100"
                     onclick={() => (imageBase64 = undefined)}
                 >
                     ✕
@@ -154,28 +154,28 @@
         {/if}
         {#if lastQA}
             <div
-                class="flex items-center justify-between px-2 mt-2 text-sm text-gray-600"
+                class="flex min-h-0 items-start justify-between gap-2 text-sm text-content-secondary"
             >
-                <div class="max-h-16 overflow-y-hidden flex-1">
+                <div class="max-h-16 min-w-0 flex-1 leading-snug text-left">
                     {formatLastQA(lastQA)}
                 </div>
                 <button
                     type="button"
-                    class="ml-2 px-2 py-1 text-xs text-gray-500 hover:text-gray-700 touch-manipulation"
+                    class="btn btn-ghost btn-xs h-7 min-h-0 shrink-0 px-2 text-content-muted hover:text-content-secondary"
                     onclick={() => (lastQA = undefined)}
                 >
                     ✕
                 </button>
             </div>
         {/if}
-        <div class="relative flex items-end gap-2 mt-2">
-            <div class="relative flex-grow">
+        <div class="flex min-w-0 items-end gap-2">
+            <div class="relative min-w-0 flex-1">
                 <textarea
                     bind:this={textarea}
                     id="chat-input"
                     placeholder="输入消息或粘贴图片..."
                     bind:value={question}
-                    class="p-2 pr-10 resize-none overflow-hidden w-full rounded-xl border border-gray-200 focus:outline-none transition-all touch-manipulation"
+                    class="textarea textarea-bordered m-0 block min-h-10 w-full resize-none border-base-200/80 bg-base-100 px-3 py-2.5 pr-10 text-base leading-5 text-base-content placeholder:text-content-placeholder/70 focus:outline-none focus:ring-2 focus:ring-primary/15 focus:border-primary/50 touch-manipulation"
                     rows="1"
                     maxlength="10000"
                     onkeydown={handleKeyDown}
@@ -184,7 +184,7 @@
                 ></textarea>
                 <button
                     type="button"
-                    class="absolute right-2 bottom-2 p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                    class="btn btn-ghost btn-sm btn-square absolute right-1.5 bottom-1.5 min-h-0 w-8 h-8 rounded-lg text-content-muted transition-colors hover:bg-base-200/80 hover:text-primary p-0"
                     onclick={() => fileInput.click()}
                     title="上传图片"
                 >
@@ -201,7 +201,7 @@
             </div>
             <button
                 type="button"
-                class="flex-shrink-0 w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center hover:bg-blue-700 active:scale-95 transition-all disabled:opacity-30 disabled:grayscale disabled:active:scale-100 touch-manipulation"
+                class="btn btn-primary btn-square h-10 min-h-10 w-10 shrink-0 border-0 p-0 touch-manipulation shadow-sm shadow-primary/20 transition-transform duration-200 hover:brightness-105 active:scale-95 disabled:pointer-events-none disabled:opacity-35 disabled:grayscale"
                 onclick={() => handleSendMessage(modelState.currentModel)}
                 disabled={!question.trim() && !imageBase64}
             >
@@ -209,19 +209,27 @@
             </button>
         </div>
         <div
-            class="flex items-center gap-2 mt-3 text-xs text-gray-500 overflow-x-auto scrollbar-none pb-1"
+            class="text-content-placeholder -mx-0.5 flex min-w-0 items-center gap-1.5 overflow-x-auto px-0.5 pb-0.5 text-xs scrollbar-none"
         >
             {#each availableModels as model, i}
                 <button
                     type="button"
-                    class="px-2 py-2 rounded-xl transition-colors duration-200 whitespace-nowrap touch-manipulation {modelState.currentModel ===
+                    class="btn btn-ghost btn-sm h-auto min-h-0 shrink-0 normal-case font-normal {modelState.currentModel ===
                     model
-                        ? 'bg-gray-200 font-bold'
-                        : 'bg-gray-100 hover:bg-gray-200'}"
+                        ? 'rounded-xl bg-primary/[0.1] py-1.5 pl-2 pr-2.5 ring-1 ring-inset ring-primary/15'
+                        : 'rounded-xl py-1.5 px-2.5 text-content-placeholder hover:bg-base-200/80 hover:text-content-muted'}"
                     onclick={() => handleSendMessage(model)}
                 >
-                    ⌘{i + 1}
-                    {MODELS[model].displayName}
+                    <span class="mr-0.5 font-mono text-[0.7rem] tabular-nums opacity-50"
+                        >⌘{i + 1}</span
+                    >
+                    <span
+                        class={modelState.currentModel === model
+                            ? "text-content-secondary/90"
+                            : ""}
+                    >
+                        {MODELS[model].displayName}
+                    </span>
                 </button>
             {/each}
         </div>

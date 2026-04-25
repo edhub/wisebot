@@ -73,7 +73,7 @@
         />
         <!-- 44×44px 最小触摸区域，视觉上保持紧凑 -->
         <button
-            class="absolute top-2 right-2 flex items-center justify-center w-11 h-11 rounded-full text-white text-xl hover:bg-white/20 active:bg-white/30 transition-colors"
+            class="btn btn-ghost btn-circle absolute top-2 right-2 w-11 h-11 min-h-0 text-white text-xl border border-white/20 hover:bg-white/20"
             style="touch-action: manipulation"
             onpointerdown={handleBtnPointerDown}
             onpointerup={handleBtnPointerUp}

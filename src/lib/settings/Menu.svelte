@@ -19,19 +19,23 @@
             showMenu = false;
         }}
         transition:fade={{ duration: 200 }}
-        class="fixed left-0 top-0 w-full h-full bg-gray-900/40 backdrop-blur-[2px] z-[100]"
+        class="fixed left-0 top-0 w-full h-full bg-neutral/40 backdrop-blur-[2px] z-[100]"
     >
         <div
             onclick={(e) => e.stopPropagation()}
             transition:slide={{ duration: 200, axis: "x" }}
-            class="fixed top-0 left-0 h-full w-80 max-w-[calc(100vw-3rem)] overflow-auto bg-white border-r border-gray-200 z-[101]"
+            class="fixed top-0 left-0 z-[101] flex h-full max-h-full w-80 max-w-[calc(100vw-3rem)] flex-col overflow-hidden rounded-r-2xl border-r border-base-200/90 bg-base-100 shadow-2xl ring-1 ring-base-200/30"
         >
-            <div class="w-full p-4">
+            <div
+                class="min-h-0 flex-1 overflow-y-auto overscroll-y-contain p-4 scrollbar-thin"
+            >
                 <ApiConfig />
             </div>
-            <div class="w-full p-4">
+            <div
+                class="shrink-0 border-t border-base-200/60 p-4 pt-3"
+            >
                 <button
-                    class="w-full p-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors"
+                    class="btn btn-error w-full rounded-xl border-0 font-medium shadow-sm transition-all duration-200 hover:brightness-95 active:scale-[0.99]"
                     onclick={() => {
                         clearChat();
                         showMenu = false;
