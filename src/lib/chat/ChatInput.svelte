@@ -209,24 +209,27 @@
             </button>
         </div>
         <div
-            class="text-content-placeholder -mx-0.5 flex min-w-0 items-center gap-1.5 overflow-x-auto px-0.5 pb-0.5 text-xs scrollbar-none"
+            class="text-content-placeholder -mx-0.5 flex min-w-0 flex-wrap content-start items-stretch gap-x-1 gap-y-1 px-0.5 pb-0.5 text-[0.7rem] leading-tight sm:gap-x-1.5 sm:gap-y-1 sm:text-xs"
         >
             {#each availableModels as model, i}
                 <button
                     type="button"
-                    class="btn btn-ghost btn-sm h-auto min-h-0 shrink-0 normal-case font-normal {modelState.currentModel ===
+                    class="btn btn-ghost btn-sm h-auto min-h-0 max-w-full shrink-0 text-left font-normal normal-case whitespace-normal {modelState.currentModel ===
                     model
-                        ? 'rounded-xl bg-primary/[0.1] py-1.5 pl-2 pr-2.5 ring-1 ring-inset ring-primary/15'
-                        : 'rounded-xl py-1.5 px-2.5 text-content-placeholder hover:bg-base-200/80 hover:text-content-muted'}"
+                        ? 'inline-flex flex-wrap items-baseline content-start justify-start gap-x-1 gap-y-0.5 rounded-lg bg-primary/[0.1] py-1 pl-1.5 pr-1.5 ring-1 ring-inset ring-primary/15 sm:rounded-xl sm:py-1.5 sm:pl-2 sm:pr-2.5'
+                        : 'inline-flex flex-wrap items-baseline content-start justify-start gap-x-1 gap-y-0.5 rounded-lg py-1 px-2 text-content-placeholder hover:bg-base-200/80 hover:text-content-muted sm:rounded-xl sm:py-1.5 sm:px-2.5'}"
                     onclick={() => handleSendMessage(model)}
                 >
-                    <span class="mr-0.5 font-mono text-[0.7rem] tabular-nums opacity-50"
-                        >⌘{i + 1}</span
-                    >
                     <span
-                        class={modelState.currentModel === model
-                            ? "text-content-secondary/90"
-                            : ""}
+                        class="shrink-0 font-mono text-[0.65rem] tabular-nums opacity-50 sm:text-[0.7rem]"
+                    >
+                        ⌘{i + 1}
+                    </span>
+                    <span
+                        class="min-w-0 max-w-full flex-1 break-words {modelState.currentModel ===
+                        model
+                            ? 'text-content-secondary/90'
+                            : ''}"
                     >
                         {MODELS[model].displayName}
                     </span>

@@ -41,32 +41,7 @@ export interface ModelConfig {
 }
 
 export const MODELS: Record<string, ModelConfig> = {
-  // "gemini-3.1-pro-preview-thinking": {
-  //   // $1.25 - $10
-  //   displayName: "Ge3.1 Pro",
-  //   fullName: "Gemini 3.1 Pro Thinking",
-  //   serverType: "bianxie",
-  //   requiresStream: true,
-  //   defaultTemperature: 0.7,
-  // },
-  "gemini-3-flash-preview-thinking": {
-    // $0.3 - $2.5
-    displayName: "Ge3 Flash",
-    fullName: "Gemini 3.0 Flash Thinking",
-    serverType: "bianxie",
-    requiresStream: true,
-    defaultTemperature: 0.7,
-  },
-  "claude-sonnet-4.6-thinking": {
-    // $0.3 - $2.5
-    displayName: "Sonnet4.6",
-    fullName: "Claude Sonnet 4.6 Thinking",
-    serverType: "bianxie",
-    requiresStream: true,
-    defaultTemperature: 0.7,
-  },
   "deepseek-v4-flash": {
-    // $0.28 - $0.42
     displayName: "DS-v4 Flash",
     fullName: "Deepseek v4 Flash",
     serverType: "deepseek",
@@ -74,17 +49,29 @@ export const MODELS: Record<string, ModelConfig> = {
     defaultTemperature: 0.7,
   },
   "deepseek-v4-pro": {
-    // $0.28 - $0.42
     displayName: "DS-v4 Pro",
     fullName: "Deepseek v4 Pro",
     serverType: "deepseek",
     requiresStream: true,
     defaultTemperature: 0.7,
   },
-  "claude-opus-4-6": {
-    // $1.0 - $1.0
-    displayName: "Opus 4.6",
-    fullName: "Claude Opus 4.6",
+  "gemini-3.5-flash": {
+    displayName: "Gemini 3.5 Flash",
+    fullName: "Gemini 3.5 Flash",
+    serverType: "bianxie",
+    requiresStream: true,
+    defaultTemperature: 0.7,
+  },
+  "claude-opus-4-7": {
+    displayName: "Opus 4.7",
+    fullName: "Claude Opus 4.7",
+    serverType: "bianxie",
+    requiresStream: true,
+    defaultTemperature: 0.7,
+  },
+  "gpt-5.5": {
+    displayName: "GPT 5.5",
+    fullName: "GPT 5.5",
     serverType: "bianxie",
     requiresStream: true,
     defaultTemperature: 0.7,
@@ -135,6 +122,8 @@ export const KEY_CURRENT_MODEL = "key_current_model";
 const KEY_LEGACY_MODEL = "last_used_model";
 
 export function getCurrentModel(): string {
+  const fallbackModel = Object.keys(MODELS)[0];
+
   // 迁移旧版存储的模型选择（只执行一次）
   const legacy = localStorage.getItem(KEY_LEGACY_MODEL);
   if (legacy && MODELS[legacy]) {
@@ -142,7 +131,12 @@ export function getCurrentModel(): string {
     localStorage.removeItem(KEY_LEGACY_MODEL);
     return legacy;
   }
-  return localStorage.getItem(KEY_CURRENT_MODEL) || Object.keys(MODELS)[0];
+
+  const currentModel = localStorage.getItem(KEY_CURRENT_MODEL);
+  if (currentModel && MODELS[currentModel]) return currentModel;
+
+  if (currentModel) localStorage.removeItem(KEY_CURRENT_MODEL);
+  return fallbackModel;
 }
 
 /**

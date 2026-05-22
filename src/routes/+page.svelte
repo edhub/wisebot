@@ -411,7 +411,7 @@
             onscroll={handleScroll}
             class="flex-1 min-h-0 scroll-smooth overflow-y-auto pt-4 scrollbar-thin sm:pt-5"
         >
-            <div class="mx-auto w-full max-w-4xl px-4 pb-32 sm:px-6">
+            <div class="mx-auto w-full max-w-5xl px-4 pb-32 sm:px-6">
                 <ChatContainer
                     resendMessage={(qa) => handleResendMessage(qa)}
                     onFollowUp={handleFollowUp}

@@ -175,6 +175,11 @@ export async function* query(
       messages,
       temperature,
       abortSignal: controller.signal,
+      ...(modelConfig.serverType === "deepseek" && {
+        providerOptions: {
+          deepseek: { thinking: { type: "disabled" as const } },
+        },
+      }),
       onError({ error }) {
         console.error("[query_api] streamText onError:", extractErrorMessage(error), error);
       },

@@ -225,15 +225,13 @@
     <div
         class="card overflow-hidden rounded-box border border-base-200/80 bg-base-100 shadow-sm ring-1 ring-base-200/30"
     >
-        <div
-            class="bg-gradient-to-b from-primary/[0.04] to-base-200/90"
-        >
+        <div class="bg-gradient-to-b from-primary/[0.04] to-base-200/90">
             <div
                 class="h-1 w-full bg-gradient-to-r from-primary/45 via-primary/25 to-primary/5"
             ></div>
             <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_noninteractive_element_interactions -->
             <article
-                class="prose prose-base prose-neutral max-w-none px-4 py-2.5 text-base leading-6 text-content-secondary [&_a]:text-primary [&_a]:no-underline [&_a:hover]:underline"
+                class="prose prose-base prose-neutral max-w-none px-4 py-2 text-base prose-p:my-2 text-content-secondary [&_a]:text-primary [&_a]:no-underline [&_a:hover]:underline"
                 onclick={handleUrlNavigation}
             >
                 {#if qandA.imageUrl}
@@ -275,7 +273,7 @@
         ></div>
         <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_noninteractive_element_interactions -->
         <article
-            class="prose prose-base prose-neutral mt-0 max-w-none bg-base-100/50 px-4 pb-4 pt-3 text-base leading-7 text-base-content/95 [&_a]:text-primary [&_a]:no-underline [&_a:hover]:underline"
+            class="prose prose-base prose-neutral mt-0 max-w-none bg-base-100/50 px-4 pb-3 pt-2 text-base prose-p:my-2 text-base-content/95 [&_a]:text-primary [&_a]:no-underline [&_a:hover]:underline"
             onclick={handleUrlNavigation}
         >
             {#if qandA.answer.length === 0 && isRespOngoing}
